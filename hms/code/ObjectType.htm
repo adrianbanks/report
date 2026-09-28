@@ -1,0 +1,58 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+
+public class ObjectType implements Serializable
+{
+	public ObjectType(String s)
+	{
+		this.obj_type = s;
+	}
+
+	public ObjectType(String s, String t)
+	{
+		this.obj_type = s;
+		this.args = t;
+	}
+
+	public String getObjectType()
+	{
+		return this.obj_type;
+	}
+
+	public String getObjectArgument()
+	{
+		return this.args;
+	}
+
+	public void setObjectType(String s)
+	{
+		this.obj_type = s;
+	}
+
+	public void setObjectArgument(String s)
+	{
+		this.args = s;
+	}
+
+	public void clear()
+	{
+		this.obj_type = "";
+		this.args = "";
+	}
+
+	public void display()
+	{
+		System.out.println("************************************");
+		System.out.println("Object Type : " + this.obj_type);
+		System.out.println("Arguments   : " + this.args);
+		System.out.println("************************************");
+	}
+
+	private String obj_type;
+	private String args;
+}
+</pre>
+</body>
+</html>

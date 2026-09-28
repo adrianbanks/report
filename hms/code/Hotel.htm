@@ -1,0 +1,2052 @@
+<html>
+<body>
+<pre>
+// Title        : ANB Networked Hotel Management System
+// Version      : 1.7
+// Copyright	: Copyright (c)1999-2000
+// Author	: Adrian Banks
+// Company	: ANB
+// Description	: A Networked Hotel Management System Used For Room Bookings
+//                 And Table Reservations.
+//
+// Mod's	: Arrays added for easier component adding.
+//		: Date and time show in status bar and update continuously.
+//
+
+import java.io.*;
+import java.awt.*;
+import java.net.*;
+import java.util.*;
+import java.awt.event.*;
+
+public class Hotel extends Frame implements ActionListener, AdjustmentListener
+{
+
+//#################################### start of allocation of global user interface items #########################
+
+	Label[] myLabels = {	/*customerPanel*/
+				new Label("Customer No.   :",Label.LEFT),
+				new Label("Surname        :",Label.LEFT),
+				new Label("Other Name(s)  :",Label.LEFT),
+				new Label("Address        :",Label.LEFT),
+				new Label("Post Code      :",Label.LEFT),
+				new Label("Telephone No.  :",Label.LEFT),
+				new Label("Booking(s)     :",Label.LEFT),
+				/*roomBooking Panel*/
+				new Label("Booking No.    :",Label.LEFT),
+				new Label("Room No.       :",Label.LEFT),
+				new Label("No. Of People  :",Label.LEFT),
+				new Label("Arrival Date   :",Label.LEFT),
+				new Label("Departure Date :",Label.LEFT),
+				new Label("Standard       :",Label.LEFT),
+				new Label("Discount       :",Label.LEFT),
+				new Label("Notes          :",Label.LEFT),
+				/*tableBookingPanel*/
+				new Label("Booking No.    :",Label.LEFT),
+				new Label("Table No.      :",Label.LEFT),
+				new Label("No. Of People  :",Label.LEFT),
+				new Label("Date           :",Label.LEFT),
+				new Label("Time           :",Label.LEFT),
+				new Label("Notes          :",Label.LEFT),
+				/*billPanel*/
+				new Label("Booking No.    :",Label.LEFT),
+				new Label("Bill Items     :",Label.LEFT),
+				new Label("VAT            :",Label.LEFT),
+				new Label("TOTAL          :",Label.LEFT),
+				/*roomPanel*/
+				new Label("Room No.       :",Label.LEFT),
+				new Label("Current Status :",Label.LEFT),
+				new Label("Booking No.(s) :",Label.LEFT),
+				new Label("Standard       :",Label.LEFT),
+				new Label("Room Size      :",Label.LEFT),
+				new Label("Bed Type       :",Label.LEFT),
+				new Label("Nightly Rate   :",Label.LEFT),
+				/*tablePanel*/
+				new Label("Table No.      :",Label.LEFT),
+				new Label("Current Status :",Label.LEFT),
+				new Label("Booking No.(s) :",Label.LEFT)
+				};
+
+	static Socket t;
+	static String server;
+	static BufferedReader in;
+
+	//Ports for input and output
+	static final int INPORT = 5050;
+	static final int OUTPORT = 5000;
+
+	//Objcet Numbers
+	static int nextCNum;
+	static int nextRNum;
+	static int nextTNum;
+	static int nextRBNum;
+	static int nextTBNum;
+	static boolean newoneC = false;
+	static boolean newoneR = false;
+	static boolean newoneT = false;
+	static boolean newoneRB = false;
+	static boolean newoneTB = false;
+
+	static ObjectInputStream ObIn;
+	static ObjectOutputStream ObOut;
+
+	static TodaysDate td;
+	CardLayout cardLayout;
+	Panel contentPanel, customerPanel, roomBookingPanel, tableBookingPanel, roomPanel, tablePanel, billPanel, managerPanel;
+	Button button1, button2, button3, button4, button5, button6;
+	static Label statusLabel1, statusLabel2;
+
+	boolean cupdate, rbupdate, tbupdate, rupdate, tupdate;
+
+        Dialog about;
+
+	TextField custText1, custText2, custText3, custText4, custText5;
+	TextField roomBookText1, roomBookText2, roomBookText3, roomBookText4, roomBookText5, roomBookText6, roomBookText7, roomBookText8;
+	TextField tableBookText1, tableBookText2, tableBookText3, tableBookText4, tableBookText5;
+	TextField billText1, billText2, billText3;
+	TextField roomText1, roomText2;
+	TextField tableText1;
+
+	TextArea custArea1, custArea2;
+	TextArea roomBookArea1, tableBookArea1;
+	TextArea billArea1;
+	TextArea roomArea1;
+	TextArea tableArea1;
+
+	Scrollbar roomBookScroll1, roomBookScroll2, roomBookScroll3, roomBookScroll4, roomBookScroll5, roomBookScroll6;
+	Scrollbar tableBookScroll1, tableBookScroll2, tableBookScroll3;
+
+	Button custButt1, custButt2;
+	Button roomBookButt1, roomBookButt2;
+	Button tableBookButt1, tableBookButt2;
+	Button billButt1, billButt2;
+	Button roomButt1, roomButt2;
+	Button tableButt1, tableButt2;
+        Button OKButton;
+
+	Choice roomBookMenu1, roomBookMenu2, roomBookMenu3;
+	Choice tableBookMenu1, tableBookMenu2;
+	Choice roomMenu1, roomMenu2, roomMenu3;
+
+	CheckboxGroup roomCheckGroup, tableCheckGroup;
+	Checkbox roomBookCheck1;
+	Checkbox roomCheckNull, roomCheck1, roomCheck2, roomCheck3, roomCheck4;
+	Checkbox tableCheckNull, tableCheck1, tableCheck2;
+
+//#################################### end of allocation of global user interface items #########################
+
+	//Create the menu bar and the menu bar items
+        MenuBar menuBar1 = new MenuBar();
+        Menu menu1 = new Menu();
+        Menu menu2 = new Menu();
+        Menu menu3 = new Menu();
+        Menu menu4 = new Menu();
+        Menu menu5 = new Menu();
+        Menu menu6 = new Menu();
+        MenuItem menuItem1 = new MenuItem();
+        MenuItem menuItem2 = new MenuItem();
+        MenuItem menuItem3 = new MenuItem();
+        MenuItem menuItem4 = new MenuItem();
+        MenuItem menuItem5 = new MenuItem();
+        MenuItem menuItem6 = new MenuItem();
+        MenuItem menuItem7 = new MenuItem();
+        MenuItem menuItem8 = new MenuItem();
+        MenuItem menuItem9 = new MenuItem();
+        MenuItem menuItem10 = new MenuItem();
+	MenuItem menuItem11 = new MenuItem();
+
+	public Hotel()
+	{
+//############################## start of basic layout ###############################
+
+		// Set up the window
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		setLocation((screenSize.width - 640) / 2, (screenSize.height - 480) / 2);
+		setTitle(" ANB Networked Hotel Management System (©1999-2000)");
+		setResizable(false);
+		setBackground(Color.lightGray);
+
+                //Stop the window from being maximised
+                addComponentListener(new ComponentAdapter() {
+                        public void componentResized(ComponentEvent evt) {
+                                setSize(640,480);
+                                Dimension scrnSize = Toolkit.getDefaultToolkit().getScreenSize();
+                                setLocation((scrnSize.width - 640) / 2, (scrnSize.height - 480) / 2);}});
+
+		//Add a menu bar
+		setMenuBar(menuBar1);
+                menu1.setLabel("File");
+                menu2.setLabel("New");
+                menu3.setLabel("Booking");
+                menu4.setLabel("Restaurant");
+                menu5.setLabel("Manager");
+                menu6.setLabel("About");
+                menuItem1.setLabel("Back-Up Data Files");
+                menuItem2.setLabel("-");
+                menuItem3.setLabel("Exit");
+                menuItem4.setLabel("Room");
+                menuItem5.setLabel("Table");
+                menuItem6.setLabel("-");
+                menuItem7.setLabel("Customer");
+                menuItem8.setLabel("Room");
+                menuItem9.setLabel("Table");
+                menuItem10.setLabel("About ANBHMS....");
+                menuItem11.setLabel("Reset All Forms");
+                menuBar1.add(menu1);
+                menuBar1.add(menu2);
+                menuBar1.add(menu4);
+                menuBar1.add(menu5);
+                menuBar1.add(menu5);
+                menuBar1.add(menu6);
+                menu1.add(menuItem11);
+                menu1.add(menuItem1);
+                menu1.add(menuItem2);
+                menu1.add(menuItem3);
+                menu2.add(menu3);
+                menu3.add(menuItem4);
+                menu3.add(menuItem5);
+                menu2.add(menuItem6);
+                menu2.add(menuItem7);
+                menu2.add(menuItem8);
+                menu2.add(menuItem9);
+                menu6.add(menuItem10);
+
+                //Add action listeners to the menu items
+                menuItem1.addActionListener(this);
+                menuItem3.addActionListener(this);
+                menuItem4.addActionListener(this);
+                menuItem5.addActionListener(this);
+                menuItem7.addActionListener(this);
+                menuItem8.addActionListener(this);
+                menuItem9.addActionListener(this);
+                menuItem10.addActionListener(this);
+                menuItem11.addActionListener(this);
+
+		//Create the main panel for the layout
+		Panel mainPanel = new Panel();
+		mainPanel.setLayout(null);
+		add(mainPanel);
+
+		//Create three panels - one for the buttons(tabs) at the top, one for
+ 		//the content of each button's panel, and the other as a status bar
+		Panel buttonPanel = new Panel();
+		buttonPanel.setLayout(null);
+		contentPanel = new Panel();
+		Panel statusPanel = new Panel();
+		statusPanel.setLayout(null);
+		buttonPanel.setBounds(0,0,639,30);
+		contentPanel.setBounds(0,30,639,386);
+		statusPanel.setBounds(0,416,639,15);
+		mainPanel.add("buttonPanel",buttonPanel);
+		mainPanel.add("contentPanel",contentPanel);
+		mainPanel.add("statusPanel",statusPanel);
+
+		//Set the content frame to have a CardLayout
+		cardLayout = new CardLayout(5,5);
+		contentPanel.setLayout(cardLayout);
+
+		//Create six panels to show when the buttons are clicked
+		customerPanel = new Panel();
+		roomBookingPanel = new Panel();
+		tableBookingPanel = new Panel();
+		billPanel = new Panel();
+		roomPanel = new Panel();
+		tablePanel = new Panel();
+		managerPanel = new Panel();
+		//Add the panels
+		contentPanel.add("customerPanel",customerPanel);
+		contentPanel.add("roomBookingPanel",roomBookingPanel);
+		contentPanel.add("tableBookingPanel",tableBookingPanel);
+		contentPanel.add("billPanel",billPanel);
+		contentPanel.add("roomPanel",roomPanel);
+		contentPanel.add("tablePanel",tablePanel);
+		contentPanel.add("managerPanel",managerPanel);
+		//Change layout manager to null for all six panels
+		customerPanel.setLayout(null);
+		roomBookingPanel.setLayout(null);
+		tableBookingPanel.setLayout(null);
+		billPanel.setLayout(null);
+		roomPanel.setLayout(null);
+		tablePanel.setLayout(null);
+		managerPanel.setLayout(null);
+
+		//Create the buttons
+		button1 = new Button("Customer");
+		button2 = new Button("Room Booking");
+		button3 = new Button("Table Booking");
+		button4 = new Button("Bill");
+		button5 = new Button("Room");
+		button6 = new Button("Table");
+		//Position the buttons
+		button1.setBounds(30,2,90,25);
+		button2.setBounds(126,2,90,25);
+		button3.setBounds(222,2,90,25);
+		button4.setBounds(318,2,90,25);
+		button5.setBounds(414,2,90,25);
+		button6.setBounds(510,2,90,25);
+		//Add listeners to the buttons
+		button1.addActionListener(this);
+		button2.addActionListener(this);
+		button3.addActionListener(this);
+		button4.addActionListener(this);
+		button5.addActionListener(this);
+		button6.addActionListener(this);
+		//Add the buttons
+		buttonPanel.add("customerButton", button1);
+		buttonPanel.add("roomBookingButton", button2);
+		buttonPanel.add("tableBookingButton", button3);
+		buttonPanel.add("billButton", button4);
+		buttonPanel.add("RoomButton", button5);
+		buttonPanel.add("TableButton", button6);
+		//Set customer button to be selected
+		button1.setBackground(Color.blue);
+		button1.setForeground(Color.white);
+
+//############################## end of basic layout ###############################
+
+
+		//.setBounds(xpos,ypos,width,height);
+
+
+//############################## start of labels ###############################
+
+		//statusPanel
+		statusLabel1 = new Label("",Label.LEFT);
+		statusLabel2 = new Label("ANB Networked Hotel Management System (©1999-2000)",Label.LEFT);
+		statusLabel1.setBounds(5,0,283,15);
+		statusLabel2.setBounds(289,0,350,15);
+		statusPanel.add("statusBarLabel1",statusLabel1);
+		statusPanel.add("statusBarLabel2",statusLabel2);
+
+		//customerPanel
+		myLabels[0].setBounds(20,12,90,15);
+		myLabels[1].setBounds(20,57,90,15);
+		myLabels[2].setBounds(345,57,90,15);
+		myLabels[3].setBounds(20,102,90,15);
+		myLabels[4].setBounds(395,137,90,15);
+		myLabels[5].setBounds(395,187,90,15);
+		myLabels[6].setBounds(20,262,90,15);
+		//roomBookingPanel
+		myLabels[7].setBounds(20,12,90,15);
+		myLabels[8].setBounds(20,57,90,15);
+		myLabels[9].setBounds(315,57,90,15);
+		myLabels[10].setBounds(20,102,90,15);
+		myLabels[11].setBounds(315,102,90,15);
+		myLabels[12].setBounds(20,147,90,15);
+		myLabels[13].setBounds(315,147,90,15);
+		myLabels[14].setBounds(20,192,90,15);
+		//tableBookingPanel
+		myLabels[15].setBounds(20,12,90,15);
+		myLabels[16].setBounds(20,57,90,15);
+		myLabels[17].setBounds(20,102,90,15);
+		myLabels[18].setBounds(20,147,90,15);
+		myLabels[19].setBounds(20,192,90,15);
+		myLabels[20].setBounds(20,237,90,15);
+		//billPanel
+		myLabels[21].setBounds(20,12,90,15);
+		myLabels[22].setBounds(20,57,90,15);
+		myLabels[23].setBounds(20,292,90,15);
+		myLabels[24].setBounds(20,337,90,15);
+		//roomPanel
+		myLabels[25].setBounds(20,12,90,15);
+		myLabels[26].setBounds(315,12,90,15);
+		myLabels[27].setBounds(20,102,90,15);
+		myLabels[28].setBounds(20,262,90,15);
+		myLabels[29].setBounds(265,262,90,15);
+		myLabels[30].setBounds(20,307,90,15);
+		myLabels[31].setBounds(265,307,90,15);
+		//tablePanel
+		myLabels[32].setBounds(20,12,90,15);
+		myLabels[33].setBounds(315,12,90,15);
+		myLabels[34].setBounds(20,102,90,15);
+
+		for(int i = 0; i <= 6; i++)
+			customerPanel.add("label"+i,myLabels[i]);
+
+		for(int i = 7; i <= 14; i++)
+			roomBookingPanel.add("label"+i,myLabels[i]);
+
+		for(int i = 15; i <= 20; i++)
+			tableBookingPanel.add("label"+i,myLabels[i]);
+
+		for(int i = 21; i <= 24; i++)
+			billPanel.add("label"+i,myLabels[i]);
+
+		for(int i = 25; i <= 31; i++)
+			roomPanel.add("label"+i,myLabels[i]);
+
+		for(int i = 32; i <= 34; i++)
+			tablePanel.add("label"+i,myLabels[i]);
+
+//############################## start of scrollbars ###############################
+
+		//roomBookingPanel
+		roomBookScroll1 = new Scrollbar(Scrollbar.VERTICAL);
+		roomBookScroll2 = new Scrollbar(Scrollbar.VERTICAL);
+		roomBookScroll3 = new Scrollbar(Scrollbar.VERTICAL);
+		roomBookScroll4 = new Scrollbar(Scrollbar.VERTICAL);
+		roomBookScroll5 = new Scrollbar(Scrollbar.VERTICAL);
+		roomBookScroll6 = new Scrollbar(Scrollbar.VERTICAL);
+		//tableBookingPanel
+		tableBookScroll1 = new Scrollbar(Scrollbar.VERTICAL);
+		tableBookScroll2 = new Scrollbar(Scrollbar.VERTICAL);
+		tableBookScroll3 = new Scrollbar(Scrollbar.VERTICAL);
+
+		//roomBookingPanel
+		roomBookScroll1.setMinimum(1);
+		roomBookScroll2.setMinimum(1);
+		roomBookScroll3.setMinimum(2000);
+		roomBookScroll4.setMinimum(1);
+		roomBookScroll5.setMinimum(1);
+		roomBookScroll6.setMinimum(2000);
+		//tableBookingPanel
+		tableBookScroll1.setMinimum(1);
+		tableBookScroll2.setMinimum(1);
+		tableBookScroll3.setMinimum(2000);
+
+		//roomBookingPanel
+		roomBookScroll1.setMaximum(41);		//Don't know why???? - a bug???
+		roomBookScroll2.setMaximum(22);
+		roomBookScroll3.setMaximum(2100);
+		roomBookScroll4.setMaximum(41);
+		roomBookScroll5.setMaximum(22);
+		roomBookScroll6.setMaximum(2100);
+		//tableBookingPanel
+		tableBookScroll1.setMaximum(41);
+		tableBookScroll2.setMaximum(22);
+		tableBookScroll3.setMaximum(2100);
+
+		//roomBookingPanel
+		roomBookScroll1.setValue(td.getDate());
+		roomBookScroll2.setValue(td.getMonth());
+		roomBookScroll3.setValue(td.getYear());
+		roomBookScroll4.setValue(td.getDate() + 1);
+		roomBookScroll5.setValue(td.getMonth());
+		roomBookScroll6.setValue(td.getYear());
+		//tableBookingPanel
+		tableBookScroll1.setValue(td.getDate());
+		tableBookScroll2.setValue(td.getMonth());
+		tableBookScroll3.setValue(td.getYear());
+
+		//roomBookingPanel
+		roomBookScroll1.setBounds(140,100,15,20);
+		roomBookScroll2.setBounds(180,100,15,20);
+		roomBookScroll3.setBounds(230,100,15,20);
+		roomBookScroll4.setBounds(445,100,15,20);
+		roomBookScroll5.setBounds(485,100,15,20);
+		roomBookScroll6.setBounds(535,100,15,20);
+		//tableBookingPanel
+		tableBookScroll1.setBounds(140,145,15,20);
+		tableBookScroll2.setBounds(180,145,15,20);
+		tableBookScroll3.setBounds(230,145,15,20);
+
+		//roomBookingPanel
+		roomBookScroll1.addAdjustmentListener(this);
+		roomBookScroll2.addAdjustmentListener(this);
+		roomBookScroll3.addAdjustmentListener(this);
+		roomBookScroll4.addAdjustmentListener(this);
+		roomBookScroll5.addAdjustmentListener(this);
+		roomBookScroll6.addAdjustmentListener(this);
+		//tableBookingPanel
+		tableBookScroll1.addAdjustmentListener(this);
+		tableBookScroll2.addAdjustmentListener(this);
+		tableBookScroll3.addAdjustmentListener(this);
+
+		//roomBookingPanel
+		roomBookingPanel.add("roomBookScroll1",roomBookScroll1);
+		roomBookingPanel.add("roomBookScroll2",roomBookScroll2);
+		roomBookingPanel.add("roomBookScroll3",roomBookScroll3);
+		roomBookingPanel.add("roomBookScroll4",roomBookScroll4);
+		roomBookingPanel.add("roomBookScroll5",roomBookScroll5);
+		roomBookingPanel.add("roomBookScroll6",roomBookScroll6);
+		//tableBookingPanel
+		tableBookingPanel.add("tableBookScroll1",tableBookScroll1);
+		tableBookingPanel.add("tableBookScroll2",tableBookScroll2);
+		tableBookingPanel.add("tableBookScroll3",tableBookScroll3);
+
+//############################## start of buttons ###############################
+
+		//customerPanel
+		custButt1 = new Button("Find Customer");
+		custButt2 = new Button("Update Details");
+		//roomBookingPanel
+		roomBookButt1 = new Button("Find Booking");
+		roomBookButt2 = new Button("Update Details");
+		//tableBookingPanel
+		tableBookButt1 = new Button("Find Booking");
+		tableBookButt2 = new Button("Update Details");
+		//billPanel
+		billButt1 = new Button("Print Bill");
+		billButt2 = new Button("Payment");
+		//roomPanel
+		roomButt1 = new Button("Find Room");
+		roomButt2 = new Button("Update Details");
+		//tablePanel
+		tableButt1 = new Button("Find Table");
+		tableButt2 = new Button("Update Details");
+
+		//customerPanel
+		custButt1.setBounds(475,295,120,25);
+		custButt2.setBounds(475,330,120,25);
+		//roomBookingPanel
+		roomBookButt1.setBounds(475,295,120,25);
+		roomBookButt2.setBounds(475,330,120,25);
+		//tableBookingPanel
+		tableBookButt1.setBounds(475,295,120,25);
+		tableBookButt2.setBounds(475,330,120,25);
+		//billPanel
+		billButt1.setBounds(475,295,120,25);
+		billButt2.setBounds(475,330,120,25);
+		//roomPanel
+		roomButt1.setBounds(475,295,120,25);
+		roomButt2.setBounds(475,330,120,25);
+		//tablePanel
+		tableButt1.setBounds(475,295,120,25);
+		tableButt2.setBounds(475,330,120,25);
+
+		//customerPanel
+		custButt1.addActionListener(this);
+		custButt2.addActionListener(this);
+		//roomBookingPanel
+		roomBookButt1.addActionListener(this);
+		roomBookButt2.addActionListener(this);
+		//tableBookingPanel
+		tableBookButt1.addActionListener(this);
+		tableBookButt2.addActionListener(this);
+		//billPanel
+		billButt1.addActionListener(this);
+		billButt2.addActionListener(this);
+		//roomPanel
+		roomButt1.addActionListener(this);
+		roomButt2.addActionListener(this);
+		//tablePanel
+		tableButt1.addActionListener(this);
+		tableButt2.addActionListener(this);
+
+		customerPanel.add("custButt1", custButt1);
+		customerPanel.add("custButt2", custButt2);
+		roomBookingPanel.add("roomBookButt1", roomBookButt1);
+		roomBookingPanel.add("roomBookButt2", roomBookButt2);
+		tableBookingPanel.add("tableBookButt1", tableBookButt1);
+		tableBookingPanel.add("tableBookButt2", tableBookButt2);
+		billPanel.add("billButt1", billButt1);
+		billPanel.add("billButt2", billButt2);
+		roomPanel.add("roomButt1", roomButt1);
+		roomPanel.add("roomButt2", roomButt2);
+		tablePanel.add("tableButt1", tableButt1);
+		tablePanel.add("tableButt2", tableButt2);
+
+//############################## start of drop down menus ###############################
+
+		//roomBookingPanel
+		roomBookMenu1 = new Choice();
+		roomBookMenu2 = new Choice();
+		roomBookMenu3 = new Choice();
+		roomBookMenu1.addItem("   ");
+		roomBookMenu1.addItem(" 1 ");
+		roomBookMenu1.addItem(" 2 ");
+		roomBookMenu1.addItem(" 3 ");
+		roomBookMenu1.addItem(" 4 ");
+		roomBookMenu2.addItem(" None ");
+		roomBookMenu2.addItem(" 5 %  ");
+		roomBookMenu2.addItem(" 10 % ");
+		roomBookMenu2.addItem(" 15 % ");
+		roomBookMenu2.addItem(" 20 % ");
+		roomBookMenu3.addItem("        ");
+		roomBookMenu3.addItem(" Basic  ");
+		roomBookMenu3.addItem(" Luxury ");
+		roomBookMenu1.setBounds(420,55,50,15);
+		roomBookMenu2.setBounds(420,145,70,15);
+		roomBookMenu3.setBounds(115,145,100,15);
+		roomBookingPanel.add("roomBookMenu1",roomBookMenu1);
+		roomBookingPanel.add("roomBookMenu2",roomBookMenu2);
+		roomBookingPanel.add("roomBookMenu3",roomBookMenu3);
+
+		//tableBookingPanel
+		tableBookMenu1 = new Choice();
+		tableBookMenu2 = new Choice();
+		tableBookMenu1.addItem("   ");
+		tableBookMenu1.addItem(" 1 ");
+		tableBookMenu1.addItem(" 2 ");
+		tableBookMenu1.addItem(" 3 ");
+		tableBookMenu1.addItem(" 4 ");
+		tableBookMenu2.addItem("       ");
+		tableBookMenu2.addItem(" 11:00 ");
+		tableBookMenu2.addItem(" 12:00 ");
+		tableBookMenu2.addItem(" 13:00 ");
+		tableBookMenu2.addItem(" 17:00 ");
+		tableBookMenu2.addItem(" 18:00 ");
+		tableBookMenu2.addItem(" 19:00 ");
+		tableBookMenu2.addItem(" 20:00 ");
+		tableBookMenu2.addItem(" 21:00 ");
+		tableBookMenu2.addItem(" 22:00 ");
+		tableBookMenu1.setBounds(115,100,50,15);
+		tableBookMenu2.setBounds(115,190,70,15);
+		tableBookingPanel.add("tableBookMenu1",tableBookMenu1);
+		tableBookingPanel.add("tableBookMenu2",tableBookMenu2);
+
+		//roomPanel
+		roomMenu1 = new Choice();
+		roomMenu2 = new Choice();
+		roomMenu3 = new Choice();
+		roomMenu1.addItem("        ");
+		roomMenu1.addItem(" Basic  ");
+		roomMenu1.addItem(" Luxury ");
+		roomMenu2.addItem("   ");
+		roomMenu2.addItem(" 1 ");
+		roomMenu2.addItem(" 2 ");
+		roomMenu2.addItem(" 3 ");
+		roomMenu2.addItem(" 4 ");
+		roomMenu3.addItem("        ");
+		roomMenu3.addItem(" Single ");
+		roomMenu3.addItem(" Double ");
+		roomMenu1.setBounds(115,260,70,15);
+		roomMenu2.setBounds(370,260,50,15);
+		roomMenu3.setBounds(115,305,70,15);
+		roomPanel.add("roomMenu1",roomMenu1);
+		roomPanel.add("roomMenu2",roomMenu2);
+		roomPanel.add("roomMenu3",roomMenu3);
+
+//############################## start of checkboxes ###############################
+
+		//roomBookingPanel
+		roomBookCheck1 = new Checkbox(" Guest Checked In", false);
+		roomBookCheck1.setBounds(420,12,150,15);
+		roomBookingPanel.add("roomBookCheck1",roomBookCheck1);
+
+		//roomPanel
+		roomCheckGroup = new CheckboxGroup();
+		roomCheckNull = new Checkbox(" ",false,roomCheckGroup);
+		roomCheck1 = new Checkbox(" Vacant",false,roomCheckGroup);
+		roomCheck2 = new Checkbox(" Occupied",false,roomCheckGroup);
+		roomCheck3 = new Checkbox(" Cleaning In Progress",false,roomCheckGroup);
+		roomCheck4 = new Checkbox(" Repair Needed",false,roomCheckGroup);
+		roomCheck1.setBounds(420,12,150,20);
+		roomCheck2.setBounds(420,32,150,20);
+		roomCheck3.setBounds(420,52,150,20);
+		roomCheck4.setBounds(420,72,150,20);
+		roomPanel.add("roomCheck1",roomCheck1);
+		roomPanel.add("roomCheck2",roomCheck2);
+		roomPanel.add("roomCheck3",roomCheck3);
+		roomPanel.add("roomCheck4",roomCheck4);
+
+		//tablePanel
+		tableCheckGroup = new CheckboxGroup();
+		tableCheckNull = new Checkbox(" ",false,tableCheckGroup);
+		tableCheck1 = new Checkbox(" Vacant",false,tableCheckGroup);
+		tableCheck2 = new Checkbox(" Occupied",false,tableCheckGroup);
+		tableCheck1.setBounds(420,12,150,20);
+		tableCheck2.setBounds(420,32,150,20);
+		tablePanel.add("tableCheck1",tableCheck1);
+		tablePanel.add("tableCheck2",tableCheck2);
+
+//############################## start of textfields ###############################
+
+		//customerPanel
+		custText1 = new TextField("",15);
+		custText2 = new TextField("",15);
+		custText3 = new TextField("",20);
+		custText4 = new TextField("",15);
+		custText5 = new TextField("",15);
+		//roomBookingPanel
+		roomBookText1 = new TextField("",15);
+		roomBookText2 = new TextField("",15);
+		roomBookText3 = new TextField(roomBookScroll1.getValue() + "",2);
+		roomBookText4 = new TextField(roomBookScroll2.getValue() + "",2);
+		roomBookText5 = new TextField(roomBookScroll3.getValue() + "",4);
+		roomBookText6 = new TextField(roomBookScroll4.getValue() + "",2);
+		roomBookText7 = new TextField(roomBookScroll5.getValue() + "",2);
+		roomBookText8 = new TextField(roomBookScroll6.getValue() + "",4);
+		//tableBookingPanel
+		tableBookText1 = new TextField("",15);
+		tableBookText2 = new TextField("",15);
+		tableBookText3 = new TextField(tableBookScroll1.getValue() + "",2);
+		tableBookText4 = new TextField(tableBookScroll2.getValue() + "",2);
+		tableBookText5 = new TextField(tableBookScroll3.getValue() + "",4);
+		//billPanel
+		billText1 = new TextField("",15);
+		billText2 = new TextField("",15);
+		billText3 = new TextField("",15);
+		//roomPanel
+		roomText1 = new TextField("",15);
+		roomText2 = new TextField("",15);
+		//tablePanel
+		tableText1 = new TextField("",15);
+
+		//customerPanel
+		custText1.setBounds(115,10,100,20);
+		custText2.setBounds(115,55,150,20);
+		custText3.setBounds(445,55,150,20);
+		custText4.setBounds(495,135,100,20);
+		custText5.setBounds(495,185,100,20);
+		//roomBookingPanel
+		roomBookText1.setBounds(115,10,100,20);
+		roomBookText2.setBounds(115,55,100,20);
+		roomBookText3.setBounds(115,100,25,20);
+		roomBookText4.setBounds(155,100,25,20);
+		roomBookText5.setBounds(195,100,35,20);
+		roomBookText6.setBounds(420,100,25,20);
+		roomBookText7.setBounds(460,100,25,20);
+		roomBookText8.setBounds(500,100,35,20);
+		//tableBookingPanel
+		tableBookText1.setBounds(115,10,100,20);
+		tableBookText2.setBounds(115,55,100,20);
+		tableBookText3.setBounds(115,145,25,20);
+		tableBookText4.setBounds(155,145,25,20);
+		tableBookText5.setBounds(195,145,35,20);
+		//billPanel
+		billText1.setBounds(115,10,100,20);
+		billText2.setBounds(115,290,100,20);
+		billText3.setBounds(115,335,100,20);
+		//roomPanel
+		roomText1.setBounds(115,10,100,20);
+		roomText2.setBounds(370,305,70,20);
+		//tablePanel
+		tableText1.setBounds(115,10,100,20);
+
+		customerPanel.add("custText1",custText1);
+		customerPanel.add("custText2",custText2);
+		customerPanel.add("custText3",custText3);
+		customerPanel.add("custText4",custText4);
+		customerPanel.add("custText5",custText5);
+		roomBookingPanel.add("roomBookText1",roomBookText1);
+		roomBookingPanel.add("roomBookText2",roomBookText2);
+		roomBookingPanel.add("roomBookText3",roomBookText3);
+		roomBookingPanel.add("roomBookText4",roomBookText4);
+		roomBookingPanel.add("roomBookText5",roomBookText5);
+		roomBookingPanel.add("roomBookText6",roomBookText6);
+		roomBookingPanel.add("roomBookText7",roomBookText7);
+		roomBookingPanel.add("roomBookText8",roomBookText8);
+		tableBookingPanel.add("tableBookText1",tableBookText1);
+		tableBookingPanel.add("tableBookText2",tableBookText2);
+		tableBookingPanel.add("tableBookText3",tableBookText3);
+		tableBookingPanel.add("tableBookText4",tableBookText4);
+		tableBookingPanel.add("tableBookText5",tableBookText5);
+		billPanel.add("billText1",billText1);
+		billPanel.add("billText2",billText2);
+		billPanel.add("billText3",billText3);
+		roomPanel.add("roomText1",roomText1);
+		roomPanel.add("roomText2",roomText2);
+		tablePanel.add("tableText1",tableText1);
+
+//############################## start of textareas ###############################
+
+		//customerPanel
+		custArea1 = new TextArea("",7,20,1);
+		custArea2 = new TextArea("",5,15,1);
+		//roomBookingPanel
+		roomBookArea1 = new TextArea("",5,50,1);
+		//tableBookingPanel
+		tableBookArea1 = new TextArea("",5,50,1);
+		//billPanel
+		billArea1 = new TextArea("",9,75,1);
+		//roomPanel
+		roomArea1 = new TextArea("",6,60,1);
+		//tablePanel
+		tableArea1 = new TextArea("",9,60,1);
+
+		//customerPanel
+		custArea1.setBounds(115,100,200,130);
+		custArea2.setBounds(115,260,230,100);
+		//roomBookingPanel
+		roomBookArea1.setBounds(115,192,300,100);
+		//tableBookingPanel
+		tableBookArea1.setBounds(115,237,300,100);
+		//billPanel
+		billArea1.setBounds(115,55,430,210);
+		//roomPanel
+		roomArea1.setBounds(115,100,240,140);
+		//tablePanel
+		tableArea1.setBounds(115,100,300,250);
+
+		customerPanel.add("custArea1",custArea1);
+		customerPanel.add("custArea2",custArea2);
+		roomBookingPanel.add("roomBookArea1",roomBookArea1);
+		tableBookingPanel.add("tableBookArea1",tableBookArea1);
+		billPanel.add("billArea1",billArea1);
+		roomPanel.add("roomArea1",roomArea1);
+		tablePanel.add("tableArea1",tableArea1);
+
+//############################## end of layout of panels ###############################
+
+		changeEnabledState(false,"all");
+		//room number disabled on room booking panel
+                roomBookText2.setEditable(false);
+		clearForms();
+	}
+
+	public static void main(String [] args) throws IOException
+	{
+		System.out.println("");
+		System.out.println("**********************************************");
+		System.out.println("*                                            *");
+		System.out.println("*   ANB Networked Hotel Management System    *");
+		System.out.println("*         (Client Application)               *");
+		System.out.println("*   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    *");
+		System.out.println("*         ©1999-2000 Adrian Banks            *");
+		System.out.println("*                                            *");
+		System.out.println("**********************************************");
+
+		//Get today's date
+       		td = new TodaysDate();
+		td.Print();
+
+		Frame f = new Hotel();
+
+		//Set up new thread for clock
+		DateTimeBar dtb = new DateTimeBar(statusLabel1);
+		dtb.start();
+
+		try
+		{
+			in = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("  Enter IP Of Server To Connect To");
+			System.out.print("     (Leave Blank For Local Host)  :> ");
+			server = in.readLine();
+			System.out.println("");
+
+			//Connect to server
+			t = new Socket(server, OUTPORT);
+			ObOut = new ObjectOutputStream(t.getOutputStream());
+			ObIn = new ObjectInputStream(t.getInputStream());
+			System.out.println("  Connected To Server");
+			System.out.println("");
+
+			//Set the next object numbers
+			try
+			{
+				Numbers n = (Numbers) ObIn.readObject();
+				nextCNum = n.getCNum();
+				nextRNum = n.getRNum();
+				nextTNum = n.getTNum();
+				nextRBNum = n.getRBNum();
+				nextTBNum = n.getTBNum();
+			}
+			catch(ClassNotFoundException cnfe)
+			{
+				System.out.println("  ERROR - Cannot Allocate Object Numbers");
+				System.out.println("  Exiting System..........");
+				System.exit(0);
+			}
+	
+			System.out.println("  Initialising GUI..........");
+
+			//possibly get rid of and put option in menu bar to quit and save info..........
+			f.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					try
+					{
+						t.close();
+					}
+					catch (IOException ioe) {}
+
+					System.out.println("  Connection To Server Closed");
+					System.out.println("  Exiting System............");
+					System.exit(0);
+				}
+			});
+
+			f.setSize(640, 480);
+			f.setVisible(true);
+
+			System.out.println("  System Running............");
+		}
+		catch (UnknownHostException uhe)
+		{
+			System.out.println("  ERROR - Cannot Find Server");
+			System.out.println("  Exiting System..........");
+			System.exit(0);
+		}
+		catch (ConnectException ce)
+		{
+			System.out.println("  ERROR - Cannot Find Server");
+			System.out.println("  Exiting System..........");
+			System.exit(0);
+		}
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+               	showMessage("ANB Networked Hotel Management System (©1999-2000)");
+
+                //************************ menu items ***************************
+                //Back-up data files
+                if (e.getSource() == menuItem1)
+                {
+                        System.out.println("back-up data files");
+                }
+		//Reset All Forms
+                if (e.getSource() == menuItem11)
+                {
+			clearForms();
+                        changeEnabledState(false,"all");
+                }
+                //Exit
+                if (e.getSource() == menuItem3)
+                {
+			try
+			{
+				t.close();
+			}
+			catch (IOException ioe) {}
+
+			System.out.println("  Connection To Server Closed");
+			System.out.println("  Exiting System............");
+			System.exit(0);
+                }
+                //Create a room booking
+                if (e.getSource() == menuItem4)
+                {
+                	if (custText2.getText().compareTo("") == 0) 
+                        {
+                        	showMessage("Please Enter (Or Find) Customer Details First");
+                        }
+                        else
+                        {
+	                        changeButton(button2, button1, button3, button4, button5, button6);
+				changeEnabledState(false,"all");
+       		                changeEnabledState(true,"rb");
+				roomBookText1.setText("RB" + nextRBNum);
+				roomBookText1.setEditable(false);
+                        	cardLayout.show(contentPanel,"roomBookingPanel");
+                        	newoneRB = true;
+                        }
+                }
+                //Create a table booking
+                if (e.getSource() == menuItem5)
+                {
+                	if (custText2.getText().compareTo("") == 0)
+                        {
+                        	showMessage("Please Enter (Or Find) Customer Details First");
+                        }
+                        else
+                        {
+	                        changeButton(button3, button1, button2, button4, button5, button6);
+				changeEnabledState(false,"all");
+	                        changeEnabledState(true,"tb");
+				tableBookText1.setText("TB" + nextTBNum);
+				tableBookText1.setEditable(false);
+	                        cardLayout.show(contentPanel,"tableBookingPanel");
+	                        newoneTB = true;
+                        }
+                }
+                //Create a new customer
+                if (e.getSource() == menuItem7)
+                {
+                        changeButton(button1, button2, button3, button4, button5, button6);
+			changeEnabledState(false,"all");
+                        changeEnabledState(true,"c");
+                        clearForms();
+			custText1.setText("CN" + nextCNum);
+			custText1.setEditable(false);
+                        cardLayout.show(contentPanel,"customerPanel");
+                        newoneC = true;
+                }
+                //Create a new room
+                if (e.getSource() == menuItem8)
+                {
+                        changeButton(button5, button1, button2, button3, button4, button6);
+			changeEnabledState(false,"all");
+                        changeEnabledState(true,"r");
+                        clearForms();
+			roomText1.setText(nextRNum + "");
+			roomText1.setEditable(false);
+                        cardLayout.show(contentPanel,"roomPanel");
+                        newoneR = true;
+                }
+                //Create a new table
+                if (e.getSource() == menuItem9)
+                {
+                        changeButton(button6, button1, button2, button3, button4, button5);
+			changeEnabledState(false,"all");
+                        changeEnabledState(true,"t");
+                        clearForms();
+			tableText1.setText(nextTNum + "");
+			tableText1.setEditable(false);
+                        cardLayout.show(contentPanel,"tablePanel");
+                        newoneT = true;
+                }
+                //About ANBHMS
+                if (e.getSource() == menuItem10)
+                {
+                	about = new Dialog(this," About ANBHMS........",true);
+
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			about.setLocation((screenSize.width - 320) / 2, (screenSize.height - 194) / 2);
+			about.setResizable(false);
+			about.setBackground(Color.lightGray);
+
+			//Create the main panel for the layout
+			Panel mainPanel = new Panel();
+			mainPanel.setLayout(null);
+			about.add(mainPanel);
+
+			//Create the labels
+			Label label1 = new Label();
+			Label label2 = new Label();
+			Label label3 = new Label();
+			Label label4 = new Label();
+			Label label5 = new Label();
+			label1.setFont(new Font("Dialog", 1, 25));
+			label2.setFont(new Font("Dialog", 1, 25));
+			label1.setText("ANB Networked Hotel");
+			label2.setText("Management System");
+			label3.setText("Version 1.7");
+			label4.setText("©1999-2000 Adrian Banks");
+			label5.setText("(MEng ESE Leicester University)");
+
+			//Create an OK button
+			OKButton = new Button();
+			OKButton.setLabel("OK");
+			OKButton.addActionListener(this);
+
+			label1.setBounds(30,10,260,30);
+			label2.setBounds(37,35,246,30);
+			label3.setBounds(235,75,65,15);
+			label4.setBounds(30,100,160,15);
+			label5.setBounds(30,125,180,15);
+			OKButton.setBounds(230,120,70,30);
+
+			mainPanel.add(label1);
+			mainPanel.add(label2);
+			mainPanel.add(label3);
+			mainPanel.add(label4);
+			mainPanel.add(label5);
+			mainPanel.add("OKButton",OKButton);
+
+                        about.setSize(320,194);
+                        about.setVisible(true);
+                }
+                if (e.getSource() == OKButton)
+                {
+                	about.setVisible(false);
+                }
+
+		//************************ panel change buttons ***************************
+		if (e.getSource() == button1)
+		{
+			changeButton(button1, button2, button3, button4, button5, button6);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"customerPanel");
+		}
+		if (e.getSource() == button2)
+		{
+			changeButton(button2, button1, button3, button4, button5, button6);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"roomBookingPanel");
+		}
+		if (e.getSource() == button3)
+		{
+			changeButton(button3, button1, button2, button4, button5, button6);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"tableBookingPanel");
+		}
+		if (e.getSource() == button4)
+		{
+			changeButton(button4, button1, button2, button3, button5, button6);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"billPanel");
+		}
+		if (e.getSource() == button5)
+		{
+			changeButton(button5, button1, button2, button3, button4, button6);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"roomPanel");
+		}
+		if (e.getSource() == button6)
+		{
+			changeButton(button6, button1, button2, button3, button4, button5);
+                        //changeEnabledState(false,"all");
+			cardLayout.show(contentPanel,"tablePanel");
+		}
+
+		//************************ customer buttons ***************************
+		//Find Customer
+		if (e.getSource() == custButt1)
+		{
+			newoneC = false;
+			newoneR = false;
+			newoneT = false;
+			newoneRB = false;
+			newoneTB = false;
+
+			ObjectType ot = new ObjectType("customer","find");
+			String cnum = new String(custText1.getText().toUpperCase());
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(cnum);
+			}
+			catch (IOException ioe)
+			{
+				showMessage("  ERROR - Could Not Send Data");
+				System.out.println("ERROR - Could Not Send Data");
+			}
+
+			try
+			{
+                               	clearForms();
+				Customer c = (Customer) ObIn.readObject();
+
+				custText1.setText(c.getNumber());
+				custText2.setText(c.getSurname());
+				custText3.setText(c.getOther_Names());
+				custArea1.setText(c.getAddress());
+				custText4.setText(c.getPostcode());
+				custText5.setText(c.getTel_Number());
+
+                               	if (c.getNumber().compareTo("Not Found") == 0)
+                                {
+                                	changeEnabledState(false,"all");
+                                     	showMessage("No Record Of Customer");
+				}
+                                else
+                                {
+                                	changeEnabledState(true,"c");/*rbtbb*/
+                                        custText1.setEditable(false);
+                                }
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (OptionalDataException ode)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+		}
+		//Update Customer
+		if ((e.getSource() == custButt2) && cupdate && !((custText1.getText().compareTo("") == 0) || (custText1.getText().compareTo("Not Found") == 0)))
+		{
+                	if (newoneC)
+                        {
+                        	newoneC = false;
+                                nextCNum++;
+                        }
+
+                	showMessage("Updating Customer Details");
+
+			ObjectType ot = new ObjectType("customer","update");
+			Customer c = new Customer();
+
+			c.setNumber(custText1.getText().toUpperCase());
+			c.setSurname(custText2.getText());
+			c.setOther_Names(custText3.getText());
+			c.setAddress(custArea1.getText());
+			c.setPostcode(custText4.getText());
+			c.setTel_Number(custText5.getText());
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(c);
+	                	showMessage("Customer Details Updated Successfully");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Send Data");
+                                showMessage("ERROR - Could Not Send Data");
+			}
+		}
+
+		//************************ room booking buttons ***************************
+		//Find Room Booking
+		if (e.getSource() == roomBookButt1)
+		{
+			newoneC = false;
+			newoneR = false;
+			newoneT = false;
+			newoneRB = false;
+			newoneTB = false;
+
+			ObjectType ota = new ObjectType("roombooking","find");
+			String rbnum = new String(roomBookText1.getText().toUpperCase());
+
+			try
+			{
+				ObOut.writeObject(ota);
+				ObOut.writeObject(rbnum);
+			}
+			catch (IOException ioe)
+			{
+				showMessage("  ERROR - Could Not Send Data");
+				System.out.println("ERROR - Could Not Send Data");
+			}
+
+			try
+			{
+                               	clearForms();
+				RoomBooking rb = (RoomBooking) ObIn.readObject();
+
+				ObjectType ot = new ObjectType("customer","find");
+				String cnum = new String(rb.getCustomerNumber());
+
+				ObOut.writeObject(ot);
+				ObOut.writeObject(cnum);
+
+				Customer c = (Customer) ObIn.readObject();
+
+				custText1.setText(c.getNumber());
+				custText2.setText(c.getSurname());
+				custText3.setText(c.getOther_Names());
+				custArea1.setText(c.getAddress());
+				custText4.setText(c.getPostcode());
+				custText5.setText(c.getTel_Number());
+
+                               	if (c.getNumber().compareTo("Not Found") == 0)
+                                {
+                                     	showMessage("No Record Of Customer");
+				}
+                                else
+                                {
+                                        custText1.setEditable(false);
+                                }
+
+				roomBookText1.setText(rb.getNumber());
+				custText1.setText(rb.getCustomerNumber());
+				roomBookText2.setText(rb.getRoomNumber());
+				roomBookText3.setText(rb.getArrivalDateDay());
+				roomBookText4.setText(rb.getArrivalDateMonth());
+				roomBookText5.setText(rb.getArrivalDateYear());
+				roomBookText6.setText(rb.getDepartureDateDay());
+				roomBookText7.setText(rb.getDepartureDateMonth());
+				roomBookText8.setText(rb.getDepartureDateYear());
+
+				if (rb.getCheckedIn().compareTo("yes") == 0)
+					roomBookCheck1.setState(true);
+				else
+					roomBookCheck1.setState(false);
+
+				if (rb.getStandard().compareTo("basic") == 0)
+					roomBookMenu3.select(" Basic  ");
+				if (rb.getStandard().compareTo("luxury") == 0)
+					roomBookMenu3.select(" Luxury ");
+
+				if (rb.getNoPeople().compareTo("1") == 0)
+					roomBookMenu1.select(" 1 ");
+				if (rb.getNoPeople().compareTo("2") == 0)
+					roomBookMenu1.select(" 2 ");
+				if (rb.getNoPeople().compareTo("3") == 0)
+					roomBookMenu1.select(" 3 ");
+				if (rb.getNoPeople().compareTo("4") == 0)
+					roomBookMenu1.select(" 4 ");
+
+				if (rb.getDiscount().compareTo("none") == 0)
+					roomBookMenu2.select(" None ");
+				if (rb.getDiscount().compareTo("5") == 0)
+					roomBookMenu2.select(" 5 %  ");
+				if (rb.getDiscount().compareTo("10") == 0)
+					roomBookMenu2.select(" 10 % ");
+				if (rb.getDiscount().compareTo("15") == 0)
+					roomBookMenu2.select(" 15 % ");
+				if (rb.getDiscount().compareTo("20") == 0)
+					roomBookMenu2.select(" 20 % ");
+
+				roomBookArea1.setText(rb.getNotes());
+
+                               	if (rb.getNumber().compareTo("Not Found") == 0)
+                                {
+                                	changeEnabledState(false,"all");
+                                     	showMessage("No Record Of Room Booking");
+				}
+                                else
+                                {
+                                	changeEnabledState(true,"rb");/*ctbb*/
+                                        roomBookText1.setEditable(false);
+                                        roomBookButt2.setLabel("Update Details");
+                                        rbupdate = true;
+                                }
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (OptionalDataException ode)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+		}
+		//Update Room Booking
+		if ((e.getSource() == roomBookButt2) && rbupdate && (roomBookButt2.getLabel().compareTo("Update Details") == 0) && !((roomBookText1.getText().compareTo("") == 0) || (roomBookText1.getText().compareTo("Not Found") == 0)))
+		{
+                        String bookingOK = "";
+
+                        //check new details are ok
+                	if (!newoneRB)
+                        {
+        	                ObjectType ot = new ObjectType("roombooking","checkup");
+				RoomBooking rb = new RoomBooking();
+
+				rb.setNumber(roomBookText1.getText().toUpperCase());
+				rb.setArrivalDateDay(roomBookText3.getText());
+				rb.setArrivalDateMonth(roomBookText4.getText());
+				rb.setArrivalDateYear(roomBookText5.getText());
+				rb.setDepartureDateDay(roomBookText6.getText());
+				rb.setDepartureDateMonth(roomBookText7.getText());
+				rb.setDepartureDateYear(roomBookText8.getText());
+
+				if (roomBookCheck1.getState() == true)
+					rb.setCheckedIn("yes");
+				else
+					rb.setCheckedIn("no");
+
+				if (roomBookMenu3.getSelectedItem().compareTo(" Basic  ") == 0)
+						rb.setStandard("basic");
+				if (roomBookMenu3.getSelectedItem().compareTo(" Luxury ") == 0)
+						rb.setStandard("luxury");
+
+				if (roomBookMenu1.getSelectedItem().compareTo(" 1 ") == 0)
+						rb.setNoPeople("1");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 2 ") == 0)
+						rb.setNoPeople("2");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 3 ") == 0)
+						rb.setNoPeople("3");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 4 ") == 0)
+						rb.setNoPeople("4");
+
+				if (roomBookMenu2.getSelectedItem().compareTo(" None ") == 0)
+						rb.setDiscount("none");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 5 %  ") == 0)
+						rb.setDiscount("5");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 10 % ") == 0)
+						rb.setDiscount("10");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 15 % ") == 0)
+						rb.setDiscount("15");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 20 % ") == 0)
+						rb.setDiscount("20");
+
+				rb.setNotes(roomBookArea1.getText());
+
+				if (checkDate(roomBookText3.getText(),roomBookText4.getText(),roomBookText5.getText(),roomBookText6.getText(),roomBookText7.getText(),roomBookText8.getText()))
+        	                {
+					try
+					{
+						ObOut.writeObject(ot);
+		                                ObOut.writeObject(rb);
+
+		                                bookingOK = (String) ObIn.readObject();
+					}
+					catch (IOException ioe)
+					{
+						showMessage("  ERROR - Could Not Send Data");
+						System.out.println("ERROR - Could Not Send Data");
+					}
+		                        catch (ClassNotFoundException cnfe)
+		                        {
+						showMessage("  ERROR - Could Not Receive Data");
+						System.out.println("ERROR - Could Not Receive Data");
+		                        }
+
+		                        if (bookingOK.compareTo("no") == 0)
+		                        {
+		                                showMessage("No Booking Available - Try Different Criteria");
+		                        }
+               	         	}
+                        	else
+                        	{
+                        	 	showMessage("Invalid Dates - Please Correct Before Proceeding");
+                        	}
+                        }
+
+                	if (newoneRB)
+                        {
+                        	newoneRB = false;
+                                nextRBNum++;
+                        }
+
+                        //if updated details are ok
+			if (bookingOK.compareTo("no") != 0)
+			{
+                		showMessage("Updating Room Booking Details");
+
+				ObjectType ot = new ObjectType("roombooking","update");
+				RoomBooking rb = new RoomBooking();
+
+				rb.setNumber(roomBookText1.getText().toUpperCase());
+				rb.setCustomerNumber(custText1.getText().toUpperCase());
+        	                rb.setRoomNumber(roomBookText2.getText());
+				rb.setArrivalDateDay(roomBookText3.getText());
+				rb.setArrivalDateMonth(roomBookText4.getText());
+				rb.setArrivalDateYear(roomBookText5.getText());
+				rb.setDepartureDateDay(roomBookText6.getText());
+				rb.setDepartureDateMonth(roomBookText7.getText());
+				rb.setDepartureDateYear(roomBookText8.getText());
+
+				if (roomBookCheck1.getState() == true)
+					rb.setCheckedIn("yes");
+				else
+					rb.setCheckedIn("no");
+
+				if (roomBookMenu3.getSelectedItem().compareTo(" Basic  ") == 0)
+						rb.setStandard("basic");
+				if (roomBookMenu3.getSelectedItem().compareTo(" Luxury ") == 0)
+						rb.setStandard("luxury");
+
+				if (roomBookMenu1.getSelectedItem().compareTo(" 1 ") == 0)
+						rb.setNoPeople("1");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 2 ") == 0)
+						rb.setNoPeople("2");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 3 ") == 0)
+						rb.setNoPeople("3");
+				if (roomBookMenu1.getSelectedItem().compareTo(" 4 ") == 0)
+						rb.setNoPeople("4");
+
+				if (roomBookMenu2.getSelectedItem().compareTo(" None ") == 0)
+						rb.setDiscount("none");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 5 %  ") == 0)
+						rb.setDiscount("5");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 10 % ") == 0)
+						rb.setDiscount("10");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 15 % ") == 0)
+						rb.setDiscount("15");
+				if (roomBookMenu2.getSelectedItem().compareTo(" 20 % ") == 0)
+						rb.setDiscount("20");
+
+				rb.setNotes(roomBookArea1.getText());
+
+				try
+				{
+					ObOut.writeObject(ot);
+					ObOut.writeObject(rb);
+		       	         	showMessage("Room Booking Details Updated Successfully");
+				}
+				catch (IOException ioe)
+				{
+					System.out.println("ERROR - Could Not Send Data");
+               		                showMessage("ERROR - Could Not Send Data");
+				}
+			}
+		}
+		//Check Booking Details Are Available (ie. the dates)
+		if ((e.getSource() == roomBookButt2) && rbupdate && (roomBookButt2.getLabel().compareTo("Check Booking") == 0) && !((roomBookText1.getText().compareTo("") == 0) || (roomBookText1.getText().compareTo("Not Found") == 0)))
+		{
+                        String bookingOK = "";
+
+                        ObjectType ot = new ObjectType("roombooking","check");
+			RoomBooking rb = new RoomBooking();
+
+			rb.setNumber(roomBookText1.getText().toUpperCase());
+			rb.setArrivalDateDay(roomBookText3.getText());
+			rb.setArrivalDateMonth(roomBookText4.getText());
+			rb.setArrivalDateYear(roomBookText5.getText());
+			rb.setDepartureDateDay(roomBookText6.getText());
+			rb.setDepartureDateMonth(roomBookText7.getText());
+			rb.setDepartureDateYear(roomBookText8.getText());
+
+			if (roomBookCheck1.getState() == true)
+				rb.setCheckedIn("yes");
+			else
+				rb.setCheckedIn("no");
+
+			if (roomBookMenu3.getSelectedItem().compareTo(" Basic  ") == 0)
+					rb.setStandard("basic");
+			if (roomBookMenu3.getSelectedItem().compareTo(" Luxury ") == 0)
+					rb.setStandard("luxury");
+
+			if (roomBookMenu1.getSelectedItem().compareTo(" 1 ") == 0)
+					rb.setNoPeople("1");
+			if (roomBookMenu1.getSelectedItem().compareTo(" 2 ") == 0)
+					rb.setNoPeople("2");
+			if (roomBookMenu1.getSelectedItem().compareTo(" 3 ") == 0)
+					rb.setNoPeople("3");
+			if (roomBookMenu1.getSelectedItem().compareTo(" 4 ") == 0)
+					rb.setNoPeople("4");
+
+			if (roomBookMenu2.getSelectedItem().compareTo(" None ") == 0)
+					rb.setDiscount("none");
+			if (roomBookMenu2.getSelectedItem().compareTo(" 5 %  ") == 0)
+					rb.setDiscount("5");
+			if (roomBookMenu2.getSelectedItem().compareTo(" 10 % ") == 0)
+					rb.setDiscount("10");
+			if (roomBookMenu2.getSelectedItem().compareTo(" 15 % ") == 0)
+					rb.setDiscount("15");
+			if (roomBookMenu2.getSelectedItem().compareTo(" 20 % ") == 0)
+					rb.setDiscount("20");
+
+			rb.setNotes(roomBookArea1.getText());
+
+			if (checkDate(roomBookText3.getText(),roomBookText4.getText(),roomBookText5.getText(),roomBookText6.getText(),roomBookText7.getText(),roomBookText8.getText()))
+                        {
+				try
+				{
+					ObOut.writeObject(ot);
+	                                ObOut.writeObject(rb);
+
+	                                bookingOK = (String) ObIn.readObject();
+				}
+				catch (IOException ioe)
+				{
+					showMessage("  ERROR - Could Not Send Data");
+					System.out.println("ERROR - Could Not Send Data");
+				}
+	                        catch (ClassNotFoundException cnfe)
+	                        {
+					showMessage("  ERROR - Could Not Receive Data");
+					System.out.println("ERROR - Could Not Receive Data");
+	                        }
+
+	                        if (bookingOK.compareTo("no") == 0)
+	                        {
+	                                showMessage("No Booking Available - Try Different Criteria");
+	                        }
+	                        else
+	                        {
+	                                roomBookText2.setText(bookingOK);
+	                                showMessage("Booking Available - Click Update Details Button To Confirm");
+					roomBookButt2.setLabel("Update Details");
+	                        }
+                        }
+                        else
+                        {
+                         	showMessage("Invalid Dates - Please Correct Before Proceeding");
+                        }
+		}
+
+		//************************ room buttons ***************************
+		//Find Room
+		if (e.getSource() == roomButt1)
+		{
+			newoneC = false;
+			newoneR = false;
+			newoneT = false;
+			newoneRB = false;
+			newoneTB = false;
+
+			ObjectType ot = new ObjectType("room","find");
+			String rnum = new String(roomText1.getText().toUpperCase());
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(rnum);
+			}
+			catch (IOException ioe)
+			{
+				showMessage("  ERROR - Could Not Send Data");
+				System.out.println("ERROR - Could Not Send Data");
+			}
+
+			try
+			{
+                                clearForms();
+				Room r = (Room) ObIn.readObject();
+
+				roomText1.setText(r.getNumber());
+
+				if (r.getStatus().compareTo("vacant") == 0)
+					roomCheck1.setState(true);
+				if (r.getStatus().compareTo("occupied") == 0)
+					roomCheck2.setState(true);
+				if (r.getStatus().compareTo("clean") == 0)
+					roomCheck3.setState(true);
+				if (r.getStatus().compareTo("repair") == 0)
+					roomCheck4.setState(true);
+
+				if (r.getStandard().compareTo("basic") == 0)
+					roomMenu1.select(" Basic  ");
+				if (r.getStandard().compareTo("luxury") == 0)
+					roomMenu1.select(" Luxury ");
+
+				if (r.getNo_Beds().compareTo("1") == 0)
+					roomMenu2.select(" 1 ");
+				if (r.getNo_Beds().compareTo("2") == 0)
+					roomMenu2.select(" 2 ");
+				if (r.getNo_Beds().compareTo("3") == 0)
+					roomMenu2.select(" 3 ");
+				if (r.getNo_Beds().compareTo("4") == 0)
+					roomMenu2.select(" 4 ");
+
+				if (r.getBed_Type().compareTo("single") == 0)
+					roomMenu3.select(" Single ");
+				if (r.getBed_Type().compareTo("double") == 0)
+					roomMenu3.select(" Double ");
+
+				roomText2.setText(r.getTariff());
+
+                               	if (r.getNumber().compareTo("Not Found") == 0)
+                                {
+                                	changeEnabledState(false,"all");
+                                     	showMessage("No Record Of Room");
+                                }
+                                else
+                                {
+                                	changeEnabledState(true,"r");
+                                        roomText1.setEditable(false);
+                                }
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (OptionalDataException ode)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+		}
+		//Update Room
+		if ((e.getSource() == roomButt2) && rupdate && !((roomText1.getText().compareTo("") == 0) || (roomText1.getText().compareTo("Not Found") == 0)))
+		{
+                	if (newoneR)
+                        {
+                        	newoneR = false;
+                                nextRNum++;
+                        }
+
+                	showMessage("Updating Room Details");
+
+			ObjectType ot = new ObjectType("room","update");
+			Room r = new Room();
+
+			r.setNumber(roomText1.getText().toUpperCase());
+
+			if (roomCheck1.getState() == true)
+				r.setStatus("vacant");
+			if (roomCheck2.getState() == true)
+				r.setStatus("occupied");
+			if (roomCheck3.getState() == true)
+				r.setStatus("clean");
+			if (roomCheck4.getState() == true)
+				r.setStatus("repair");
+
+			if (roomMenu1.getSelectedItem().compareTo(" Basic  ") == 0)
+					r.setStandard("basic");
+			if (roomMenu1.getSelectedItem().compareTo(" Luxury ") == 0)
+					r.setStandard("luxury");
+
+			if (roomMenu2.getSelectedItem().compareTo(" 1 ") == 0)
+					r.setNo_Beds("1");
+			if (roomMenu2.getSelectedItem().compareTo(" 2 ") == 0)
+					r.setNo_Beds("2");
+			if (roomMenu2.getSelectedItem().compareTo(" 3 ") == 0)
+					r.setNo_Beds("3");
+			if (roomMenu2.getSelectedItem().compareTo(" 4 ") == 0)
+					r.setNo_Beds("4");
+
+			if (roomMenu3.getSelectedItem().compareTo(" Single ") == 0)
+					r.setBed_Type("single");
+			if (roomMenu3.getSelectedItem().compareTo(" Double ") == 0)
+					r.setBed_Type("double");
+
+			r.setTariff(roomText2.getText());
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(r);
+		               	showMessage("Room Details Updated Successfully");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Send Data");
+                                showMessage("ERROR - Could Not Send Data");
+			}
+		}
+
+		//************************ table buttons ***************************
+		//Find Table
+		if (e.getSource() == tableButt1)
+		{
+			newoneC = false;
+			newoneR = false;
+			newoneT = false;
+			newoneRB = false;
+			newoneTB = false;
+
+			ObjectType ot = new ObjectType("table","find");
+			String tnum = new String(tableText1.getText().toUpperCase());
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(tnum);
+			}
+			catch (IOException ioe)
+			{
+				showMessage("  ERROR - Could Not Send Data");
+				System.out.println("ERROR - Could Not Send Data");
+			}
+
+			try
+			{
+                               	clearForms();
+				Table t = (Table) ObIn.readObject();
+
+				tableText1.setText(t.getNumber());
+
+				if (t.getStatus().compareTo("vacant") == 0)
+					tableCheck1.setState(true);
+				if (t.getStatus().compareTo("occupied") == 0)
+					tableCheck2.setState(true);
+
+                               	if (t.getNumber().compareTo("Not Found") == 0)
+                                {
+                                	changeEnabledState(false,"all");
+                                     	showMessage("No Record Of Table");
+				}
+                                else
+                                {
+                                	changeEnabledState(true,"t");
+                        		tableText1.setEditable(false);
+                                }
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (OptionalDataException ode)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Receive Data");
+                                showMessage("ERROR - Could Not Receive Data");
+			}
+		}
+                //Update Table
+		if ((e.getSource() == tableButt2) && tupdate && !((tableText1.getText().compareTo("") == 0) || (tableText1.getText().compareTo("Not Found") == 0)))
+		{
+                	if (newoneT)
+                        {
+                        	newoneT = false;
+                                nextTNum++;
+                        }
+
+                	showMessage("Updating Customer Details");
+
+			ObjectType ot = new ObjectType("table","update");
+			Table t = new Table();
+
+			t.setNumber(tableText1.getText().toUpperCase());
+
+			if (tableCheck1.getState() == true)
+				t.setStatus("vacant");
+			if (tableCheck2.getState() == true)
+				t.setStatus("occupied");
+
+			try
+			{
+				ObOut.writeObject(ot);
+				ObOut.writeObject(t);
+	                	showMessage("Table Details Updated Successfully");
+			}
+			catch (IOException ioe)
+			{
+				System.out.println("ERROR - Could Not Send Data");
+                                showMessage("ERROR - Could Not Send Data");
+			}
+		}
+
+
+
+
+
+	//managerPanel exists as well......
+
+	}
+
+	public void adjustmentValueChanged(AdjustmentEvent e)
+	{
+		if (e.getSource() == roomBookScroll1)
+		{
+			roomBookText3.setText(roomBookScroll1.getValue() + "");
+		}
+		else if (e.getSource() == roomBookScroll2)
+		{
+			roomBookText4.setText(roomBookScroll2.getValue() + "");
+		}
+		else if (e.getSource() == roomBookScroll3)
+		{
+			roomBookText5.setText(roomBookScroll3.getValue() + "");
+		}
+		else if (e.getSource() == roomBookScroll4)
+		{
+			roomBookText6.setText(roomBookScroll4.getValue() + "");
+		}
+		else if (e.getSource() == roomBookScroll5)
+		{
+			roomBookText7.setText(roomBookScroll5.getValue() + "");
+		}
+		else if (e.getSource() == roomBookScroll6)
+		{
+			roomBookText8.setText(roomBookScroll6.getValue() + "");
+		}
+		else if (e.getSource() == tableBookScroll1)
+		{
+			tableBookText3.setText(tableBookScroll1.getValue() + "");
+		}
+		else if (e.getSource() == tableBookScroll2)
+		{
+			tableBookText4.setText(tableBookScroll2.getValue() + "");
+		}
+		else if (e.getSource() == tableBookScroll3)
+		{
+			tableBookText5.setText(tableBookScroll3.getValue() + "");
+		}
+	}
+
+	private void changeButton(Button arg, Button arg1, Button arg2, Button arg3, Button arg4, Button arg5)
+	{
+			arg1.setBackground(Color.lightGray);
+			arg2.setBackground(Color.lightGray);
+			arg3.setBackground(Color.lightGray);
+			arg4.setBackground(Color.lightGray);
+			arg5.setBackground(Color.lightGray);
+			arg.setBackground(Color.blue);
+			arg1.setForeground(Color.black);
+			arg2.setForeground(Color.black);
+			arg3.setForeground(Color.black);
+			arg4.setForeground(Color.black);
+			arg5.setForeground(Color.black);
+			arg.setForeground(Color.white);
+
+                       	newoneC = false;
+			newoneR = false;
+			newoneT = false;
+			newoneRB = false;
+			newoneTB = false;
+	}
+
+	public void clearForms()
+	{
+		//customerPanel
+		custText1.setText("");
+		custText2.setText("");
+		custText3.setText("");
+		custText4.setText("");
+		custText5.setText("");
+		custArea1.setText("");
+		custArea2.setText("");
+		//roomBookingPanel
+		roomBookText1.setText("");
+		roomBookText2.setText("");
+		roomBookText3.setText("");
+		roomBookText4.setText("");
+		roomBookText5.setText("");
+		roomBookText6.setText("");
+		roomBookText7.setText("");
+		roomBookText8.setText("");
+		roomBookArea1.setText("");
+                roomBookMenu1.select(0);
+                roomBookMenu2.select(0);
+                roomBookMenu3.select(0);
+                roomBookCheck1.setState(false);
+		roomBookButt2.setLabel("Check Booking");
+		//tableBookingPanel
+		tableBookText1.setText("");
+		tableBookText2.setText("");
+		tableBookText3.setText("");
+		tableBookText4.setText("");
+		tableBookText5.setText("");
+		tableBookArea1.setText("");
+		//billPanel
+		billText1.setText("");
+		billText2.setText("");
+		billText3.setText("");
+		billArea1.setText("");
+		//roomPanel
+		roomText1.setText("");
+		roomText2.setText("");
+		roomArea1.setText("");
+                roomMenu1.select(0);
+                roomMenu2.select(0);
+                roomMenu3.select(0);
+                roomCheckGroup.setSelectedCheckbox(roomCheckNull);
+		//tablePanel
+		tableText1.setText("");
+		tableArea1.setText("");
+                tableCheckGroup.setSelectedCheckbox(tableCheckNull);
+		//Number boxes
+		custText1.setEditable(true);
+		roomBookText1.setEditable(true);
+		tableBookText1.setEditable(true);
+		roomText1.setEditable(true);
+		tableText1.setEditable(true);
+
+               	newoneC = false;
+		newoneR = false;
+		newoneT = false;
+		newoneRB = false;
+		newoneTB = false;
+	}
+
+	public void changeEnabledState(boolean editableState, String s)
+	{
+		cupdate = false;
+		rupdate = false;
+		tupdate = false;
+		rbupdate = false;
+		tbupdate = false;
+
+        	if ((s.compareTo("all") == 0) || (s.compareTo("c") == 0) || (s.compareTo("crbtbb") == 0))
+                {
+			//customerPanel
+			custText2.setEditable(editableState);
+			custText3.setEditable(editableState);
+			custText4.setEditable(editableState);
+			custText5.setEditable(editableState);
+			custArea1.setEditable(editableState);
+			custArea2.setEditable(editableState);
+			cupdate = editableState;
+                }
+
+        	if ((s.compareTo("all") == 0) || (s.compareTo("rb") == 0) || (s.compareTo("crbtbb") == 0))
+                {
+			//roomBookingPanel
+			roomBookText3.setEditable(editableState);
+			roomBookText4.setEditable(editableState);
+			roomBookText5.setEditable(editableState);
+			roomBookText6.setEditable(editableState);
+			roomBookText7.setEditable(editableState);
+			roomBookText8.setEditable(editableState);
+			roomBookArea1.setEditable(editableState);
+			roomBookCheck1.setEnabled(editableState);
+			roomBookMenu1.setEnabled(editableState);
+			roomBookMenu2.setEnabled(editableState);
+			roomBookMenu3.setEnabled(editableState);
+			rbupdate = editableState;
+                }
+
+               	if ((s.compareTo("all") == 0) || (s.compareTo("tb") == 0) || (s.compareTo("crbtbb") == 0))
+                {
+			//tableBookingPanel
+			tableBookText2.setEditable(editableState);
+			tableBookText3.setEditable(editableState);
+			tableBookText4.setEditable(editableState);
+			tableBookText5.setEditable(editableState);
+			tableBookArea1.setEditable(editableState);
+			tableBookMenu1.setEnabled(editableState);
+			tableBookMenu2.setEnabled(editableState);
+			tbupdate = editableState;
+		}
+
+        	if ((s.compareTo("all") == 0) || (s.compareTo("b") == 0) || (s.compareTo("crbtbb") == 0))
+                {
+			//billPanel
+			billText2.setEditable(editableState);
+			billText3.setEditable(editableState);
+			billArea1.setEditable(editableState);
+                }
+
+        	if ((s.compareTo("all") == 0) || (s.compareTo("r") == 0))
+                {
+			//roomPanel
+			roomText2.setEditable(editableState);
+			roomArea1.setEditable(editableState);
+			roomCheck1.setEnabled(editableState);
+			roomCheck2.setEnabled(editableState);
+			roomCheck3.setEnabled(editableState);
+			roomCheck4.setEnabled(editableState);
+			roomMenu1.setEnabled(editableState);
+			roomMenu2.setEnabled(editableState);
+			roomMenu3.setEnabled(editableState);
+			rupdate = editableState;
+		}
+
+        	if ((s.compareTo("all") == 0) || (s.compareTo("t") == 0))
+                {
+			//tablePanel
+			tableArea1.setEditable(editableState);
+			tableCheck1.setEnabled(editableState);
+			tableCheck2.setEnabled(editableState);
+			tupdate = editableState;
+		}
+	}
+
+        public void showMessage(String s)
+	{
+		statusLabel2.setText(s);
+	}
+
+        public boolean checkDate(String da, String ma, String ya, String db, String mb, String yb)
+        {
+        	try
+                {
+                	//Arrival Date
+	        	int yr = Integer.parseInt(ya);
+	                int mon = Integer.parseInt(ma);
+	                int dy = Integer.parseInt(da);
+
+                        //Departure Date
+	        	int yra = Integer.parseInt(yb);
+	                int mona = Integer.parseInt(mb);
+	                int dya = Integer.parseInt(db);
+
+                        //Arrival Date
+    			if ((mon < 1) || (mon > 12))
+				return false;
+
+        	        if (((mon == 4) || (mon == 6) || (mon == 9) || (mon == 11)) && ((dy < 1) || (dy > 30)))
+        	        	return false;
+
+                	if (((mon == 1) || (mon == 3) || (mon == 5) || ((mon > 6) && (mon < 9)) || (mon == 10) || (mon == 12)) && ((dy < 1) || (dy > 31)))
+				return false;
+
+	                if ((mon == 2) && ((yr % 4) == 0) && ((dy < 1) || (dy > 29)))
+        	        	return false;
+
+                	if ((mon == 2) && ((yr % 4) != 0) && ((dy < 1) || (dy > 28)))
+                		return false;
+
+                        //Departure Date
+    			if ((mona < 1) || (mona > 12))
+				return false;
+
+        	        if (((mona == 4) || (mona == 6) || (mona == 9) || (mona == 11)) && ((dya < 1) || (dya > 30)))
+        	        	return false;
+
+                	if (((mona == 1) || (mona == 3) || (mona == 5) || ((mona > 6) && (mona < 9)) || (mona == 10) || (mona == 12)) && ((dya < 1) || (dya > 31)))
+				return false;
+
+	                if ((mona == 2) && ((yra % 4) == 0) && ((dya < 1) || (dya > 29)))
+        	        	return false;
+
+                	if ((mona == 2) && ((yra % 4) != 0) && ((dya < 1) || (dya > 28)))
+                		return false;
+
+                        //Check dates against each other
+                        if (yra < yr)
+                        	return false;
+
+                        if ((yra == yr) && (mona < mon))
+                        	return false;
+
+                        if ((yra == yr) && (mona == mon) && (dya < dy))
+                        	return false;
+
+        	        return true;
+                }
+                catch(NumberFormatException nfe)
+                {
+                	return false;
+                }
+	}
+}
+</pre>
+</body>
+</html>
+

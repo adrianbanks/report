@@ -1,0 +1,69 @@
+body
+{
+    color	: #000000;
+    font-family	: times new roman;
+    font-size	: 12pt;
+    text-align	: justify;
+    cursor	: default;
+}
+
+A
+{
+    font-weight		: bold;
+    text-decoration	: none;
+    cursor		: default;
+}
+
+A:link
+{
+    color	: #0000ff
+}
+
+A:visited
+{
+    color	: #0000cc
+}
+
+A:active
+{
+    color	: #0066ff
+}
+
+A:hover
+{
+    color		: #ff0000;
+    text-decoration	: none
+}
+
+#contents
+{
+    font-family	: georgia;
+    text-align	: none;
+}
+
+#heading
+{
+    font-size		: 22pt;
+    font-weight		: bold;
+    text-decoration	: underline;
+}
+
+#smallheading
+{
+    font-size		: 14pt;
+    font-weight		: bold;
+    text-decoration	: underline;
+}
+
+#mediumheading
+{
+    font-size		: 16pt;
+    font-weight		: bold;
+    text-decoration	: underline;
+}
+
+#tiny
+{
+    font-size		: 8pt;
+    text-decoration	: none;
+}

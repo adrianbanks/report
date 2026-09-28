@@ -1,0 +1,94 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+
+<body>
+
+<div id="smallheading">
+Overview
+</div>
+<br>
+The Hotel Management System will be split up into two applications, a server and a client. This is to allow the system to operate on a network.
+<br>
+<br>
+The client application will consist of a graphical user interface that will control event-driven message routines capable of sending objects over the network to the server application and receiving replies. 
+<br>
+<br>
+The server application will consist of the data store for the system and will be capable of both sending and receiving data across the network.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Collaboration Diagrams
+</div>
+<br>
+The collaboration diagrams for the system can be split up into categories relating to their function.
+<br>
+<br>
+<br>
+<div style="text-decoration:underline">
+"Create Object" Diagrams
+</div>
+<br>
+<div align=left>
+<img src="createcustomer.gif" alt="The collaboration diagram for createCustomer()">
+<img src="createroom.gif" alt="The collaboration diagram for createRoom()">
+<img src="createtable.gif" alt="The collaboration diagram for createTable()">
+<img src="createroombooking.gif" alt="The collaboration diagram for createRoomBooking()">
+<img src="createtablebooking.gif" alt="The collaboration diagram for createTableBooking()">
+</div>
+<br>
+<br>
+The system uses a similar design to create all of the objects it needs since each class has its own constructor function. The main class only needs to call the "new" command each time.
+<br>
+<br>
+<br>
+<div style="text-decoration:underline">
+"Update Object" Diagrams
+</div>
+<br>
+<div align=left>
+<img src="updatecustomer.gif" alt="The collaboration diagram for update() for the Customer Class">
+<img src="updateroom.gif" alt="The collaboration diagram for update() for the Room Class">
+<img src="updatetable.gif" alt="The collaboration diagram for update() for the Table Class">
+<img src="updateroombooking.gif" alt="The collaboration diagram for update() for the Room Booking Class">
+<img src="updatetablebooking.gif" alt="The collaboration diagram for update() for the Table Booking Class">
+<img src="updatebill.gif" alt="The collaboration diagram for update() for the Bill Class">
+</div>
+<br>
+<br>
+The above collaboration diagrams represent how each of the objects within the system are updated.
+<br>
+<br>
+The send() command between the Hotel and Rserver classes represents the data (object) being sent over the network from the client application to the server application.
+<br>
+<br>
+The add() command can be used to update the object since the data will be referenced by a unique key (by means of a hash table). This means that adding an object into a database where it already exists will simply overwrite the existing copy.
+<br>
+<br>
+<br>
+<div style="text-decoration:underline">
+"Find Object" Diagrams
+</div>
+<br>
+<div align=left>
+<img src="findcustomer.gif" alt="The collaboration diagram for find() for the Customer Class">
+<img src="findroom.gif" alt="The collaboration diagram for find() for the Room Class">
+<img src="findtable.gif" alt="The collaboration diagram for find() for the Table Class">
+<img src="findroombooking.gif" alt="The collaboration diagram for find() for the Room Booking Class">
+<img src="findtablebooking.gif" alt="The collaboration diagram for find() for the Table Booking Class">
+<img src="findbill.gif" alt="The collaboration diagram for find() for the Bill Class">
+</div>
+<br>
+<br>
+The above diagrams represent how the system looks up an object to see if it is one of the databases. The two send() commands are used to send the data over the network from the client to the server and vice-versa.
+<br>
+<br>
+All of these collaboration diagrams represent the main functions that can be initiated by the graphical user interface buttons and menu commands.
+<br>
+<br>
+
+</body>
+</html>

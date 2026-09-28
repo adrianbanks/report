@@ -1,0 +1,54 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+
+public class Table implements Serializable
+{
+	private String Number;
+	private String Status;
+
+	public Table()
+	{
+		this.Number = "";
+		this.Status = "";
+	}
+
+	public Table(String num, String stat)
+	{
+		this.Number = num;
+		this.Status = stat;
+	}
+
+	public String getNumber()
+	{
+		return this.Number;
+	}
+
+	public String getStatus()
+	{
+		return this.Status;
+	}
+
+	public void setNumber(String x)
+	{
+		this.Number = x;
+	}
+
+	public void setStatus(String x)
+	{
+		this.Status = x;
+	}
+
+	public void display()
+	{
+		System.out.println("");
+		System.out.println("  Table Updated :");
+		System.out.println("     Table Number : " + this.Number);
+		System.out.println("     Status       : " + this.Status);
+		System.out.println("");
+	}
+}
+</pre>
+</body>
+</html>

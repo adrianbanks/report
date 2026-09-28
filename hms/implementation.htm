@@ -1,0 +1,260 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+
+<body>
+
+<div id="smallheading">
+Overview
+</div>
+<br>
+The Hotel Management System is implemented as two stand-alone Java applications capable of running over a network.
+<br>
+<br>
+The server application loads all of the previous data into memory upon start up and waits for instructions from the client application. The client application consists of the graphical user interface and is event driven. Messages are sent to the server as commands that are then executed and return data displayed to the user via the interface. Updated/new data is stored in the memory by the server application.
+<br>
+<br>
+Upon termination of the client application, the server stores all of the current data stored in the system to disk to keep a permanent record. This data is retrieved when the application is run again.
+<br>
+<br>
+Since the system must "know" the current date and time, the multi-threading feature of Java is used to create a date/time object that continually updates the system's date and time. This is also displayed on the user interface at all times.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Networking
+</div>
+<br>
+The networking side of the application was implemented by using the port/socket model of a network and was coded to represent this.
+<br>
+<br>
+Firstly, the server application sets up a socket and then listens for the client application to connect :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+System.out.println("  Waiting For Connection.......");
+<br>
+ServerSocket listener = new ServerSocket(INPORT);
+<br>
+Socket s = listener.accept();
+<br>
+System.out.println("  Connected To Client");
+</pre>
+</blockquote>
+</blockquote>
+<br>
+<span style="font-family:courier new">
+INPORT
+</span>
+ is a constant used to assign the port number to be used. This is set as port number 5000. 
+<br>
+<br>
+The client application then sets up a socket to connect to the server application :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+Socket t = new Socket(server, OUTPORT);
+</pre>
+</blockquote>
+</blockquote>
+<br>
+Again 
+<span style="font-family:courier new">
+OUTPORT
+</span>
+ is a constant used to assign the port number.
+<br>
+<br>
+Input and output between both the server and client applications is achieved by use of two different port number - one for each direction of data transfer - port numbers 5000 and 5050. Input and output can be achieved by associating ObjectInputStream and ObjectOutputStream with the desired input and output streams of the socket :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+ObIn = new ObjectInputStream(s.getInputStream());
+<br>
+ObOut = new ObjectOutputStream(s.getOutputStream());
+<div align=right style="font-family:times new roman; font-size:12pt">
+(Server application)
+</div>
+<br>
+<br>
+ObOut = new ObjectOutputStream(t.getOutputStream());
+<br>
+ObIn = new ObjectInputStream(t.getInputStream());
+<div align=right style="font-family:times new roman; font-size:12pt">
+(Client application)
+</div>
+</pre>
+</blockquote>
+</blockquote>
+<br>
+Once this structure has been initiated, transfer of data between the server and client applications as user-defined objects is relatively straight-forward by use of the standard java.io package.
+<br>
+<br>
+Objects can be written out to the network by the use of the writeObject() method :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+ObOut.writeObject(r);
+</pre>
+</blockquote>
+</blockquote>
+<br>
+A similar method is used to read in objects using the readObject() method, but the object read must be cast to the correct object type using the cast operator :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+c = (Customer) ObIn.readObject();
+</pre>
+</blockquote>
+</blockquote>
+<br>
+When the applications terminate, the socket is simply closed using the close() method :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+t.close();
+</pre>
+</blockquote>
+</blockquote>
+<br>
+<br>
+<div id="smallheading">
+Data Types
+</div>
+<br>
+Several different data types are used within the system. These provide an efficient method of storing complex data in an easily accessible way.
+<br>
+<br>
+The hotel management system implements its own defined classes to represent real world objects that form an integral part of the hotel. Customers, rooms, table, bookings and bills all have their own associated classes. Each class has its own attributes and several constructors to enable instances of these classes to store information about the hotel and the future state of the hotel.
+<br>
+<br>
+Hash tables are used throughout to keep a record of the data within the system. They provide a useful method of storing and retrieving instances of classes. Each object has a corresponding unique key that is used to access it from the hash table. This key can be made from the object itself making each object individual, but not allowing for duplicates of objects since they reference the same place within the hash table.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Algorithms
+</div>
+<br>
+Several interesting algorithms are used within the coding of the Hotel Management System, but by far the most interesting one is the following :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+FileOutputStream ostream = new FileOutputStream(CUSTOMERDATAFILE);
+<br>
+ObjectOutputStream fout = new ObjectOutputStream(ostream);
+<br>
+<br>
+for (Enumeration e = ht_customer.keys(); e.hasMoreElements();)
+<br>
+{
+<blockquote>
+Object name = (Object) e.nextElement();
+<br>
+fout.writeObject((Customer) ht_customer.get(name.toString()));
+</blockquote>
+}
+<br>
+<br>
+fout.close();
+</pre>
+</blockquote>
+</blockquote>
+<br>
+This is used in the closing down routine of the server application to search through the hash tables storing all of the information about the state of the hotel and then save that information to a file.
+<br>
+<br>
+The algorithm makes use of an enumeration to sequentially step through each record within the hash table. If a record exists, it is written out to the file and the next record is then checked. This is a good algorithm because it accesses the objects stored in the hash table without knowing their unique keys, yet does not take much code. All of the objects will be accessed by the enumeration until there are no more objects remaining unchecked, and the file will then be closed. This could not be possible without the use of the enumeration interface.
+<br>
+<br>
+Another interesting piece of code is used to allow the objects associated with the hotel to be transmitted over the network :
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<pre>
+public class Customer implements Serializable {}
+</pre>
+</blockquote>
+</blockquote>
+<br>
+The serializable interface allows objects to be serialised so that they can be sent over a network structure. This makes use of the readObject and writeObject methods. Any class that needs to be sent over the network must implement the Serializable interface, otherwise an error may occur.
+<br>
+<br>
+When objects are read in from the network, they need to be cast to the correct object type so that the classes fields can be restored correctly. This can cause problems if objects of different type are being sent and their type is not known in advance. To overcome this, a class ObjectType has been implemented which is sent across the network before any other object is sent. This allows the server/client application to determine the incoming object type before is reaches the application so that it can be cast to the correct class type.
+<br>
+<br>
+The class ObjectType has two fields, both of which are strings. The first represents the type of the following object to be read in. The second string provides arguments for the application so that it knows how to process the incoming object. This class was implemented to aid in the transmission of objects over the network to reduce errors encountered by the system.
+<br>
+<br>
+<br>
+<div id="smallheading">
+User Interface
+</div>
+<br>
+The graphical user interface consists of six panes that can be accessed by means of tabs situated at the top of the window (figure 5.1). These panes contain all of the information about each aspect of the system and are linked together so that all of the information about a particular customer's stay can be accessed.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="userinterface.gif" alt="Figure 5.1 : A screenshot showing the tabbed panes of the display window">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 5.1 : A screenshot showing the tabbed panes of the display window.
+</div>
+<br>
+<br>
+Controls situated on the panes, along with the mouse-driven menus contribute to the overall control of the system.
+<br>
+<br>
+Every system function can be accessed from this user interface which acts as a front end to the system with which the user interacts. This interface is part of the client application that communicates with the main server application when any actions are taken.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Testing
+</div>
+<br>
+Testing has been done on both the server and the client applications to a basic level. Run time errors have been checked wherever possible and caught using the "try-catch" structure.
+<br>
+<br>
+When any external file is accessed, either for input or output, error checking has been added in case the file cannot be found. If this is so, the file is either assumed to not have existed before, or another file is created.
+<br>
+<br>
+When network errors occur, the connection is closed and all data is saved to file. Since this is done at the server end, the amount of data which can be lost is minimal and amounts to only one record's worth (if it cannot be sent to the server from the client application).
+<br>
+<br>
+The majority of error checking involves the graphical user interface (eg. checking that the date entered is a valid date). This is implemented within the client application before any communication with the server application commences.
+<br>
+<br>
+The system has been designed to be fully Year 2000 compliant and works fine with any date (but is set to work only with dates before 31st December, 2100 - this can easily be modified). 
+<br>
+<br>
+
+</body>
+</html>

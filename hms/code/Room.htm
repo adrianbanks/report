@@ -1,0 +1,110 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+
+public class Room implements Serializable
+{
+	private String Number;
+	private String Standard;
+	private String No_Beds;
+	private String Bed_Type;
+	private String Tariff;
+	private String Status;
+
+	public Room()
+	{
+		this.Number = "";
+		this.Standard = "";
+		this.No_Beds = "";
+		this.Bed_Type = "";
+		this.Tariff = "";
+		this.Status = "";
+	}
+
+	public Room(String num, String stan, String beds, String type, String tarif, String stats)
+	{
+		this.Number = num;
+		this.Standard = stan;
+		this.No_Beds = beds;
+		this.Bed_Type = type;
+		this.Tariff = tarif;
+		this.Status = stats;
+	}
+
+	public String getNumber()
+	{
+		return this.Number;
+	}
+
+	public String getStandard()
+	{
+		return this.Standard;
+	}
+
+	public String getNo_Beds()
+	{
+		return this.No_Beds;
+	}
+
+	public String getBed_Type()
+	{
+		return this.Bed_Type;
+	}
+
+	public String getTariff()
+	{
+		return this.Tariff;
+	}
+
+	public String getStatus()
+	{
+		return this.Status;
+	}
+
+	public void setNumber(String x)
+	{
+		this.Number = x;
+	}
+
+	public void setStandard(String x)
+	{
+		this.Standard = x;
+	}
+
+	public void setNo_Beds(String x)
+	{
+		this.No_Beds = x;
+	}
+
+	public void setBed_Type(String x)
+	{
+		this.Bed_Type = x;
+	}
+
+	public void setTariff(String x)
+	{
+		this.Tariff = x;
+	}
+
+	public void setStatus(String x)
+	{
+		this.Status = x;
+	}
+
+	public void display()
+	{
+		System.out.println("");
+		System.out.println("  Room Updated :");
+		System.out.println("     Room Number  : " + this.Number);
+		System.out.println("     Standard     : " + this.Standard);
+		System.out.println("     No. Of Beds  : " + this.No_Beds);
+		System.out.println("     Type Of Beds : " + this.Bed_Type);
+		System.out.println("     Tariff (£)   : " + this.Tariff);
+		System.out.println("     Room Status  : " + this.Status);
+		System.out.println("");
+	}
+}
+</pre>
+</body>
+</html>

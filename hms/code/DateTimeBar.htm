@@ -1,0 +1,169 @@
+<html>
+<body>
+<pre>
+import java.awt.*;
+import java.util.*;
+
+class DateTimeBar extends Thread
+{
+	public DateTimeBar(Label l)
+	{
+		thisLabel = l;
+	}
+
+	public void run()
+	{
+		int d;
+		String day = "";
+		String date = "";
+		String date_bit = "";
+		String month = "";
+		String year = "";
+		String hours = "";
+		String minutes = "";
+		String seconds = "";
+
+		Date today = new Date();
+
+		try
+		{
+			while (true)
+			{
+				today = new Date();
+				d = today.getDay();
+
+				switch (d)
+				{
+					case 0:
+					day = "Sunday";
+					break;
+					case 1:
+						day = "Monday";
+						break;
+					case 2:
+						day = "Tuesday";
+						break;
+					case 3:
+						day = "Wednesday";
+						break;
+					case 4:
+						day = "Thursday";
+						break;
+					case 5:
+						day = "Friday";
+						break;
+					case 6:
+						day = "Saturday";
+						break;
+				}
+
+				d = today.getDate();
+
+				if ((d == 1) || (d == 21) || (d == 31))
+				{
+					date = d + "";
+					date_bit = "st";
+				}
+				else if ((d == 2) || (d == 22))
+				{
+					date = d + "";
+					date_bit = "nd";
+				}
+				else if ((d == 3) || (d == 23))
+				{
+					date = d + "";
+					date_bit = "rd";
+				}
+				else
+				{
+					date = d + "";
+					date_bit = "th";
+				}
+
+				d = today.getMonth() + 1;
+
+				switch (d)
+				{
+					case 1:
+						month = "January";
+						break;
+					case 2:
+						month = "February";
+						break;
+					case 3:
+						month = "March";
+						break;
+					case 4:
+						month = "April";
+						break;
+					case 5:
+						month = "May";
+						break;
+					case 6:
+						month = "June";
+						break;
+					case 7:
+						month = "July";
+						break;
+					case 8:
+						month = "August";
+						break;
+					case 9:
+						month = "September";
+						break;
+					case 10:
+						month = "October";
+						break;
+					case 11:
+						month = "November";
+						break;
+					case 12:
+						month = "December";
+						break;
+				}
+
+				d = today.getYear();
+				d = d + 1900;
+
+				year = d + "";
+
+				d = today.getHours();
+				hours = d + "";
+
+				d = today.getMinutes();
+
+				if (d < 10)
+				{
+					minutes = "0" + d + "";
+				}
+				else
+				{
+					minutes = d + "";
+				}
+
+				d = today.getSeconds();
+
+				if (d < 10)
+				{
+					seconds = "0" + d + "";
+				}
+				else
+				{
+					seconds = d + "";
+				}
+
+				String st = "  " + day + " " + date + date_bit + " " + month + " " + year + "      " + hours + ":" + minutes + ":" + seconds;
+
+				thisLabel.setText(st);
+			}
+		}
+		catch (NullPointerException npe)
+		{
+		}
+	}
+
+	private Label thisLabel;
+}
+</pre>
+</body>
+</html>

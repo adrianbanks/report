@@ -1,0 +1,256 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+
+<body>
+
+<div id="smallheading">
+Conceptual Diagram
+</div>
+<br>
+<div align=center>
+<img src="conceptual.gif" alt="Figure 3.1 : The conceptual diagram for the system (with the class attributes not shown)">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 3.1 : The conceptual diagram for the system (with the class attributes not shown)
+</div>
+<br>
+<br>
+The conceptual diagram (figure 3.1) has undergone several modifications during the course of its life, making the system more comprehensible with each change.
+<br>
+<br>
+Each real-world object within the hotel has its own class within the software model to aid in the structure of the programming code and the use of object-oriented design techniques. The relevant attributes of each real-world object have also been assigned to the class representing it within the model to give a more realistic representation.
+<br>
+<br>
+The table below shows each class along with its associated attributes.
+<br>
+<br>
+<br>
+<div align=center>
+<table cellpadding=6 cellspacing=0 border=1>
+<tr><td align=center width=300>
+<div id="smallheading">
+Class Name
+</div>
+</td><td align=center width=300>
+<div id="smallheading">
+Attributes
+</div>
+</td></tr>
+<tr><td>
+Hotel
+</td><td>
+<ul>
+<li>Number Of Rooms
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Restaurant
+</td><td>
+<ul>
+<li>Number Of Tables
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Customer Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Room Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Table Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Booking Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Room Booking Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Table Booking Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Bill Database
+</td><td>
+&nbsp;
+</td></tr>
+<tr><td>
+Customer
+</td><td>
+<ul>
+<li>Customer Number
+<li>Surname
+<li>Other Names
+<li>Address
+<li>Post Code
+<li>Telephone Number
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Room
+</td><td>
+<ul>
+<li>Room Number
+<li>Standard Of Room
+<li>Number Of Beds
+<li>Type Of Beds
+<li>Standard Tariff
+<li>Status
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Table
+</td><td>
+<ul>
+<li>Table Number
+<li>Status
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Room Booking
+</td><td>
+<ul>
+<li>Booking Number
+<li>Arrival Date
+<li>Departure Date (Estimated)
+<li>Number Of People
+<li>Standard
+<li>Discount
+<li>Guest Checked In (Boolean)
+<li>Special Requirements
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Table Booking
+</td><td>
+<ul>
+<li>Booking Number
+<li>Date
+<li>Time
+<li>Number Of People
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Bill
+</td><td>
+<ul>
+<li>Total
+<li>Bill
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Bill Item
+</td><td>
+<ul>
+<li>Item Description
+<li>Price
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Refund
+</td><td>
+<ul>
+<li>Item Of Refund
+<li>Amount
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Receipt
+</td><td>
+<ul>
+<li>Type
+</li>
+</ul>
+</td></tr>
+<tr><td>
+Complaint
+</td><td>
+<ul>
+<li>Type
+<li>Description
+</li>
+</ul>
+</td></tr>
+</table>
+</div>
+<br>
+<br>
+Several databases exist inside the system to store all of the information regarding the hotel (figure 3.2). Each database holds all of the objects for a particular class. These can be easily searched for records and added to if necessary.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="databases.gif" alt="Figure 3.2 : Part of the conceptual diagram showing the databases">
+</div>
+<div align=center style="font-style:italic">
+Figure 3.2 : Part of the conceptual diagram showing the databases
+</div>
+<br>
+<br>
+The conceptual diagram can be split up into three distinct areas that demonstrate how the system is made up. The first of these is concerned with rooms.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="rooms.gif" alt="Figure 3.3 : Part of the conceptual diagram showing part of the Hotel side of the system">
+</div>
+<div align=center style="font-style:italic">
+Figure 3.3 : Part of the conceptual diagram showing part of the Hotel side of the system
+</div>
+<br>
+<br>
+Figure 3.3 shows the relationships between the customer and a room when a booking has been made, and how the data associated with the booking is stored by the system.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="tables.gif" alt="Figure 3.4 : Part of the conceptual diagram showing part of the Restaurant side of the system">
+</div>
+<div align=center style="font-style:italic">
+Figure 3.4 : Part of the conceptual diagram showing part of the Restaurant side of the system
+</div>
+<br>
+<br>
+Figure 3.4 shows how a customer is associated with a table when a table booking is made by use of the table booking class, and how the information is stored by the system.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="bill.gif" alt="Figure 3.5 : Part of the conceptual diagram showing how bill information is stored">
+</div>
+<div align=center style="font-style:italic">
+Figure 3.5 : Part of the conceptual diagram showing how bill information is stored
+</div>
+<br>
+<br>
+Figure 3.5 shows how bill items are associated to a customer and how they are stored by the system in the Bill Database.
+<br>
+<br>
+
+</body>
+</html>

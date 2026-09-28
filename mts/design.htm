@@ -1,0 +1,489 @@
+<html>
+<head>
+<title> ANBMTS - Motion Tracking Using Java (©2000-2001 Adrian Banks)</title>
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="stylesheet" type="text/css" href="report.css">
+
+<body topmargin=0 leftmargin=0 marginwidth=0 marginheight=0>
+
+<table border=0 cellpadding=5 cellspacing=2 width=100% height=100%>
+<tr width=100%><td width=225 height=115 valign=top>
+<div align=center>
+<a href="anbmts.htm">
+<img src="logo.gif" width=180 height=80 border=0></a>
+</div>
+<br>
+<br>
+<div id="contents" align=center>
+<big>
+<u>
+<strong>
+Contents
+</strong>
+</u>
+</big>
+</div>
+<div id="contents">
+<ul>
+<li><a href="summary.htm">Summary</a><br><br></li>
+<li><a href="introduction.htm">Introduction</a><br><br></li>
+<li><a href="design.htm">Design &amp; Specification</a><br><br></li>
+<li><a href="implementation.htm">Implementation &amp; Testing</a><br><br></li>
+<li><a href="management.htm">Project Management</a><br><br></li>
+<li><a href="conclusions.htm">Conclusions</a><br><br></li>
+<li><a href="appendix.htm">Appendix</a><br><br></li>
+<li><a href="bibliography.htm">Bibliography</a><br><br></li>
+</ul>
+<br>
+<br>
+<br>
+<div id="copyright" style="font-size:7pt">
+©2000-2001 Adrian Banks
+<br>
+Last Updated : 18th May 2001
+</div>
+</div>
+</td><td valign=top style="text-align:justify">
+<!--main content start here-->
+
+<div id="smallheading">
+Assumptions & Design Restrictions
+</div>
+<br>
+To fulfil a successful design and implementation of a real time motion tracking system, certain restrictions had to be decided on for the way in which objects would be tracked.
+<br>
+<br>
+Firstly, since the main objective of the system is to track "George" the robot who is circular in shape (viewed from above), the main assumption behind the design of the motion tracking algorithm is that only objects that appear as circular in shape from above will be recognised (ie. circles, upright cylinders and spheres).
+<br>
+<br>
+Secondly, since George can move at a maximum speed of X mm/sec (as quoted in the initial design problem), an assumption has been made on the maximum speed of an object being tracked. This assumption is that in any two adjacent images taken by the camera, an object's centre from the first image is within the object's boundary in the second image.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="assumption.gif" alt="Figure 2.1a : assumption made on the speed of motion of an object">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.1a : assumption made on the speed of motion of an object
+</div>
+<br>
+<br>
+Figure 2.1a shows two adjacent frames taken by the camera. Image one shows the ball and its centre. Image two shows the ball having moved in the time between which the two images were taken. For motion tracking to take place, it is assumed that the centre of the ball in its position in image two is within the boundary of the ball in image one.
+<br>
+<br>
+By making this assumption, a restriction is put on the maximum speed of a moving object that can be tracked by the system, which varies according to the size of the object being tracked. This restriction is necessary because the system has a definite time to calculate the new position of the object from the picture data. If the image analysis were not completed before the next frame was analysed, the system would lose track of the moving object. As a result, tracking is speeded up massively since it is not necessary to scan the whole image in each frame to locate the circle. If the position of the circle was lost, the program could resort to scanning the whole image to re-find the circle from scratch.
+<br>
+<br>
+An added area of complexity is due to the fact that the camera is moving. Whilst tracking the circle, it is the relative speed of the circle in relation to the movement of the camera that is applicable and not the absolute speed of the circle.
+<br>
+<br>
+One final assumption is that since the camera is always overhead when videoing an object, there is no depth perception (ie. the camera is a permanent vertical distance from the object). This assumption is required because of the design of the camera mounting rig.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Camera Resolution
+</div>
+<br>
+The camera being used to capture image data is a "Philips VGA Digital Camera". This camera is capable of capturing colour and black and white images at various resolutions. As the resolution increases, the physical size of a captured image in memory increases, as does the number of pixels contained within the image.
+<br>
+<br>
+Measurements were done (see <span style="font-style:italic">"Camera Resolution"</span> section in the Appendix) and a resolution of 160 by 120 pixels was decided upon based on the height of the camera from the second year design track (as stated in the initial design problem) when in its mounting. This height is estimated at 66.0cm (26.0"), giving a total visible area for the camera of 50.5cm by 35.1cm (19.9" by 13.8"). This is an adequate visible are for the system to perform analysis on and will allow errors, as an object should still be visible by the camera even if the system loses track of it, allowing the system to reanalyse the image data to re-find the object. This also satisfies memory requirements with a single image from the camera being 28.8Kbytes in size - small enough for several images to be stored easily in memory at one time without demanding too much of the system's resources.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Edge Detection
+</div>
+<br>
+There are many edge detection techniques and algorithms in existence that provide an accurate result when implemented correctly. Some of these are considered below.
+<br>
+<br>
+<blockquote>
+<blockquote>
+<div style="text-decoration:underline">
+Laplace Filter
+</div>
+<br>
+This is a 2<sup>nd</sup> order partial derivative taken in two dimensions with respect to each direction (also called "the divergence of the gradient"). This returns a value of zero when the rate of intensity change in an image is either zero or linear (ie. no edge). The drawback to this method is that a great deal of noise is introduced into the result of edge detection unless pre-filtering steps are taken using a Gaussian low-pass filter.
+<br>
+<br>
+<div style="text-decoration:underline">
+Canny Algorithm
+</div>
+<br>
+This uses a 1st derivative filter to compute gradients within an image and then estimates noise levles by calculating the root mean square of the 2nd derivative of the filter response. In reality, this uses the Laplace filter technique above with the extension of noise estimation.
+<br>
+<br>
+<div style="text-decoration:underline">
+Condensation Algorithm (Conditional Density Algorithm)
+</div>
+<br>
+This uses a probability density function to estimate different possibilities of edges within an image and to then apply the correct one. This algorithm is capable of detecting objects in complex images and can run in near real-time.
+<br>
+<br>
+<div style="text-decoration:underline">
+JAI - <span style="font-family:Courier New">GradientMagnitude()</span>
+</div>
+<br>
+This is an extension to the Java language that provides extra support for image processing. The <span style="font-family:Courier New">GradientMagnitude()</span> method uses a kernel to process the image using a convolution method to give an image with just the edges.
+<br>
+<br>
+<div style="text-decoration:underline">
+Hough Transform
+</div>
+<br>
+This is used to detect straight lines within an image by the use of a mapping to a parameter space, followed by a sorting algorithm.
+<br>
+<br>
+</blockquote>
+</blockquote>
+<br>
+Each of these techniques provides a method of performing edge detection on a image and there are many more in existence. The problem lies in which one to use. Some techniques are optimised for straight lines (horizontal, vertical or diagonal) and others for simple circles.
+<br>
+<br>
+Of the techniques listed above, the only ones that works with colour images are the GradientMagnitude method of the JAI interface and the Hough Transform. All of the other techniques require a greyscale image to function correctly, adding more processing time to the algorithms. Since speed is the priority in this project, these techniques will not suffice. Whilst the JAI method does use colour, it is necessary to have the language extension installed to compile or run any code that uses it. This is an obvious drawback to the universal nature of the Java language making the algorithm not suitable for this application. Similarly, the Hough Transform is not suitable because it primarily identifies straight lines and will therefore not detect circles within an image.
+<br>
+<br>
+To combat these problems, a customised technique, "Pixel Colour Difference", was developed to prform edge detection, giving a crude but speedy result. This works by using a three-dimensional colour model and calculating the Pythagorean distance between the values of the components of the colours of adjacent pixels (red r, green g, blue b components) within an image (see Figure 2.3a). A difference of squares method is used to eliminate any negative values to give a comparable value.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="edgedetection.gif" alt="Figure 2.3a : a 3D colour model">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.3a : a 3D colour model
+</div>
+<br>
+<br>
+This calculated distance is then compared with a threshold value to determine if is a sudden rapid change in colour exists. This change of colour is taken to signify that an edge exists at the particular point within the image. If an edge is determined, it is marked on the image.
+<br>
+<br>
+If this technique is used throughout an entire image, every edge within the image can be detected. By altering the sensitivity threshold (see <span style="font-style:italic">"threshold value"</span> in Figure 2.3b), adjustment of the amount of edges detected can be achieved. This can be adjusted at any time during execution.
+<br>
+<br>
+To perform edge detection on an entire image, each pixel in the image is compared with its adjacent pixel. The colours of these pixels are used to calculate if an edge exists at that particular point in the image. For a full image, this must be done many times by scrolling through the image pixel by pixel and performing this calculation on each pair of pixels encountered
+<br>
+<br>
+<br>
+<div align=center>
+<img src="scanning.gif" alt="Figure 2.3b : edge detection technique developed for speed and simplicity">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.3b : edge detection technique developed for speed and simplicity
+</div>
+<br>
+Problems arise with this method when scanning in the same direction as a straight edge, since there is no colour transition between adjacent pixels. This is not a major problem however, as the system is intended to be used to track circles only. If it were to be a problem, it could be overcome by simply scanning in another direction. 
+<br>
+<br>
+Since the edge detection algorithm does not involve any complex image handling techniques such as kernels or Gaussian filters, it should be performed very quickly during execution.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Motion Tracking
+</div>
+<br>
+As already discussed, basic motion tracking will be achieved using the assumption that the centre of the circle being tracked at any time will lie within the circumference of the circle in the previous frame (see <span style="font-style:italic">"Assumptions & Restrictions"</span> section).
+<br>
+<br>
+This allows the motion tracking algorithm to be simple, utilising only basic mathematical techniques to calculate the position of the circle once edge detection has been performed.
+<br>
+<br>
+To calculate the position of the circle in a frame after edge detection has been performed, it is necessary to take four measurements from the image. By starting at the position of the centre of the circle in the previous frame and scanning both horizontally and vertically until an edge is found (see Figure 2.4a), the position of the centre of the circle in the current frame can be calculated 
+<br>
+<br>
+<blockquote>
+<blockquote>
+Because of the symmetry of the circle, the new centre of the circle on the x-axis lies directly in the centre of any chord of the circle that is at a tangent to a radius parallel to the y-axis. This is similarly true for the new centre of the circle on the y-axis.
+<br>
+<br>
+<blockquote>
+Hence,
+<br>
+<div style="font-family:Arial;font-weight:bold">
+<blockquote>
+<blockquote>
+x<sub>d</sub> + d<sub>1</sub> = ½ (d<sub>1</sub> + d<sub>1</sub>)
+<br>
+<br> 
+=> &nbsp;&nbsp;&nbsp;x<sub>d</sub> = ½ (d<sub>2</sub> - d<sub>1</sub>) 
+</blockquote>
+</blockquote>
+</div>
+<br>
+Similarly,
+<br>
+<div style="font-family:Arial;font-weight:bold">
+<blockquote>
+<blockquote>
+y<sub>d</sub> + d<sub>3</sub> = ½ (d<sub>3</sub> + d<sub>4</sub>)
+<br>
+<br>
+=> &nbsp;&nbsp;&nbsp;y<sub>d</sub> = ½ (d<sub>4</sub> - d<sub>3</sub>)
+</blockquote>
+</blockquote>
+</div>
+<br>
+The new centre of the circle <span style="font-family:Arial;font-weight:bold">(x<sub>2</sub>,y<sub>2</sub>)</span> lies at :
+<br>
+<br>
+<div style="font-family:Arial;font-weight:bold">
+<blockquote>
+<blockquote>
+(x<sub>2</sub>,y<sub>2</sub>) = (x<sub>1</sub> + ½ (d<sub>2</sub> - d<sub>1</sub>), y<sub>1</sub> + ½ (d<sub>4</sub> - d<sub>3</sub>))
+</blockquote>
+</blockquote>
+</div>
+</blockquote>
+</blockquote>
+</blockquote>
+where
+<br>
+<blockquote>
+<blockquote>
+<span style="font-family:Arial;font-weight:bold">x<sub>2</sub></span> is the x-coordinate value of the centre of the circle in the current frame
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">x<sub>1</sub></span> is the x-coordinate value of the centre on the circle in the previous frame
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">y<sub>2</sub></span> is the y-coordinate value of the centre of the circle in the current frame
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">y<sub>1</sub></span> is the y-coordinate value of the centre on the circle in the previous frame
+<br>
+<br>
+</blockquote>
+</blockquote>
+and
+<br>
+<blockquote>
+<blockquote>
+<span style="font-family:Arial;font-weight:bold">d<sub>1</sub></span> is the distance between <span style="font-family:Arial;font-weight:bold">x<sub>1</sub></span> and the left edge of  current circle with the same <span style="font-family:Arial;font-weight:bold">y</span> value 
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">d<sub>2</sub></span> is the distance between <span style="font-family:Arial;font-weight:bold">x<sub>1</sub></span> and the right edge of  current circle with the same <span style="font-family:Arial;font-weight:bold">y</span> value 
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">d<sub>3</sub></span> is the distance between <span style="font-family:Arial;font-weight:bold">y<sub>1</sub></span> and the bottom edge of  current circle with the same <span style="font-family:Arial;font-weight:bold">x</span> value 
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">d<sub>4</sub></span> is the distance between <span style="font-family:Arial;font-weight:bold">y<sub>1</sub></span> and the top edge of  current circle with the same <span style="font-family:Arial;font-weight:bold">x</span> value 
+<br>
+<br>
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">x<sub>1</sub>, y<sub>2</sub></span> are known from the previous analysis.
+<br>
+<br>
+<span style="font-family:Arial;font-weight:bold">d<sub>1</sub>, d<sub>2</sub>, d<sub>3</sub>, d<sub>4</sub></span> can be measured from the current image during the <span style="font-family:Courier New;">trackMotion()</span> method.
+</blockquote>
+</blockquote>
+<br>
+<br>
+Since only two calculations are needed (x-axis and y-axis calculations) to determine the new position of the circle, the motion tracking algorithm is extremely fast and so can be theoretically done in real-time.
+<br>
+<br>
+This motion tracking method may not be the most accurate, but speed is the priority.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="motion.gif" alt="Figure 2.4a : method for determining the new location of the circle">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.4a : method for determining the new location of the circle
+</div>
+<br>
+<br>
+This could, time permitting, be extended further to include a predicative element based on analysis of the two previous frames and an application of Newton's laws of motion to estimate where the circle will be next : 
+<br>
+<br>
+<blockquote>
+<blockquote>
+1. From positions <span style="font-family:Wingdings;">①</span> to <span style="font-family:Wingdings;">②</span> in Figure 2.4b, the speed of the circle can be calculated.
+<br>
+<br>
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+average speed = distance / time
+<br>
+<br>
+v<sub>x</sub> = X<sub>n-2</sub> - X<sub>n-3</sub> <span style="font-family:Times New Roman;font-weight:normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if each frame interval is taken as time = 1 unit</span>
+<br>
+<br>
+v<sub>y</sub> = Y<sub>n-2</sub> - Y<sub>n-3</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+2. The acceleration for positions <span style="font-family:Wingdings;">②</span> to <span style="font-family:Wingdings;">③</span> can then be calculated.
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+s = ut + ½at<sup>2</sup>
+<br>
+<br>
+s<sub>x</sub> = v<sub>x</sub> + ½a<sub>x</sub> = (X<sub>n-2</sub> - X<sub>n-3</sub>) + ½a<sub>x</sub>
+<br>
+<br>
+s<sub>y</sub> = v<sub>y</sub> + ½a<sub>y</sub> = (Y<sub>n-2</sub> - Y<sub>n-3</sub>) + ½a<sub>y</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+Hence, since
+<br>
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+s<sub>x</sub> = X<sub>n-1</sub> - X<sub>n-2</sub>
+<br>
+<br>
+s<sub>y</sub> = Y<sub>n-1</sub> - Y<sub>n-2</sub>
+</div>
+</blockquote>
+</blockquote>
+and
+<br>
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+a<sub>x</sub> = 2(X<sub>n-1</sub> - 2X<sub>n-2</sub> + X<sub>n-3</sub>)
+<br>
+<br>
+a<sub>y</sub> = 2(Y<sub>n-1</sub> - 2Y<sub>n-2</sub> + Y<sub>n-3</sub>)
+</div>
+</blockquote>
+</blockquote>
+<br>
+3. The speed from <span style="font-family:Wingdings;">②</span> to <span style="font-family:Wingdings;">③</span> can now be calculated.
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+v = u + at
+<br>
+<br>
+v<sub>x</sub> = (X<sub>n-2</sub> - X<sub>n-3</sub>) + a<sub>x</sub> = (X<sub>n-2</sub> - X<sub>n-3</sub>) + 2(X<sub>n-1</sub> - 2X<sub>n-2</sub> + X<sub>n-3</sub>)
+<br>
+<br>
+v<sub>y</sub> = (Y<sub>n-2</sub> - Y<sub>n-3</sub>) + a<sub>y</sub> = (Y<sub>n-2</sub> - Y<sub>n-3</sub>) + 2(Y<sub>n-1</sub> - 2Y<sub>n-2</sub> + Y<sub>n-3</sub>)
+</div>
+</blockquote>
+</blockquote>
+<br>
+<br>
+Simplifying
+<br>
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+v<sub>x</sub> = 2X<sub>n-1</sub> - 3X<sub>n-2</sub> + X<sub>n-3</sub>
+<br>
+<br>
+v<sub>y</sub> = 2Y<sub>n-1</sub> - 3Y<sub>n-2</sub> + Y<sub>n-3</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+4. The distance travelled between positions <span style="font-family:Wingdings;">③</span> and <span style="font-family:Wingdings;">④</span> can then be determined, giving the location at which the circle should be in the current frame (assuming no external forces act upon the circle to change its velocity).
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+s = ut + ½at<sup>2</sup>
+<br>
+<br>
+s<sub>x</sub> = v<sub>x</sub> + ½a<sub>x</sub>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (2X<sub>n-1</sub> - 3X<sub>n-2</sub> + X<sub>n-3</sub>) + ½(2(X<sub>n-1</sub> - 2X<sub>n-2</sub> + X<sub>n-3</sub>))
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 3X<sub>n-1</sub> - 5X<sub>n-2</sub> + 4X<sub>n-3</sub>
+<br>
+<br>
+s<sub>y</sub> = v<sub>y</sub> + ½a<sub>y</sub>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (2Y<sub>n-1</sub> - 3Y<sub>n-2</sub> + Y<sub>n-3</sub>) + ½(2(Y<sub>n-1</sub> - 2Y<sub>n-2</sub> + Y<sub>n-3</sub>))
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 3Y<sub>n-1</sub> - 5Y<sub>n-2</sub> + 4Y<sub>n-3</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+<br>
+5. By combining the known location of the circle from the previous frame with this distance travelled, a prediction of the new location can be calculated.
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+X<sub>n</sub> = X<sub>n-1</sub> + s<sub>x</sub> = X<sub>n-1</sub> + 3X<sub>n-1</sub> - 5X<sub>n-2</sub> + 4X<sub>n-3</sub>
+<br>
+Y<sub>n</sub> = Y<sub>n-1</sub> + s<sub>y</sub> = Y<sub>n-1</sub> + 3Y<sub>n-1</sub> - 5Y<sub>n-2</sub> + 4Y<sub>n-3</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+Therefore the predicted centre of the circle in the current frame is 
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+(X<sub>n</sub>,Y<sub>n</sub>)
+<br>
+</blockquote>
+</blockquote>
+where
+<br>
+<blockquote>
+<blockquote>
+<div style="font-family:Arial;font-weight:bold">
+X<sub>n</sub> = 4X<sub>n-1</sub> - 5X<sub>n-2</sub> + 4X<sub>n-3</sub>
+<br>
+Y<sub>n</sub> = 4Y<sub>n-1</sub> - 5Y<sub>n-2</sub> + 4Y<sub>n-3</sub>
+</div>
+</blockquote>
+</blockquote>
+<br>
+This analysis is only a prediction and may not be correct, especially if the circle being tracked is accelerating or changing direction
+<br>
+<br>
+<br>
+<div align=center>
+<img src="track.gif" alt="Figure 2.4b : a three frame analysis of the motion of the circle">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.4b : a three frame analysis of the motion of the circle
+</div>
+<br>
+<br>
+<div id="smallheading">
+Class Diagram
+</div>
+<br>
+The coding of the system has been done to Object-Oriented standards to maintain data integrity between the main classes involved in the system. All data is denoted as <span style="font-family:Courier New">private</span> data where possible, with access to it by external classes gained by use of accessor functions. Full use of inheritance is implemented by the <span style="font-family:Courier New">ImagePane</span> class giving rise to two derived classes, <span style="font-family:Courier New">IPSetup</span> and <span style="font-family:Courier New">IPMotion</span>, each of which contain the data and methods of the <span style="font-family:Courier New">ImagePane</span> class with some additional components.
+<br>
+<br>
+The class diagram shown in Figure 2.5a shows the relationships between each of the classes involved in the system and the callable methods that are available for each class. This is a detailed class diagram representing a very close approximation to the final code.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="classdiagram.gif" alt="Figure 2.5a : the class diagram for the system">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 2.5a : the class diagram for the system
+</div>
+<br>
+<br>
+
+<!--main content end here-->
+</td></tr>
+</table>
+
+</html>

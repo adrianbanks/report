@@ -1,0 +1,110 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+
+public class Customer implements Serializable
+{
+	private String Number;
+	private String Surname;
+	private String Other_Names;
+	private String Address;
+	private String Postcode;
+	private String Tel_Number;
+
+	public Customer()
+	{
+		this.Number = "";
+		this.Surname = "";
+		this.Other_Names = "";
+		this.Address = "";
+		this.Postcode = "";
+		this.Tel_Number = "";
+	}
+
+	public Customer(String num, String snom, String onom, String add, String pcod, String tel)
+	{
+		this.Number = num;
+		this.Surname = snom;
+		this.Other_Names = onom;
+		this.Address = add;
+		this.Postcode = pcod;
+		this.Tel_Number = tel;
+	}
+
+	public String getNumber()
+	{
+		return this.Number;
+	}
+
+	public String getSurname()
+	{
+		return this.Surname;
+	}
+
+	public String getOther_Names()
+	{
+		return this.Other_Names;
+	}
+
+	public String getAddress()
+	{
+		return this.Address;
+	}
+
+	public String getPostcode()
+	{
+		return this.Postcode;
+	}
+
+	public String getTel_Number()
+	{
+		return this.Tel_Number;
+	}
+
+	public void setNumber(String x)
+	{
+		this.Number = x;
+	}
+
+	public void setSurname(String x)
+	{
+		this.Surname = x;
+	}
+
+	public void setOther_Names(String x)
+	{
+		this.Other_Names = x;
+	}
+
+	public void setAddress(String x)
+	{
+		this.Address = x;
+	}
+
+	public void setPostcode(String x)
+	{
+		this.Postcode = x;
+	}
+
+	public void setTel_Number(String x)
+	{
+		this.Tel_Number = x;
+	}
+
+	public void display()
+	{
+		System.out.println("");
+		System.out.println("  Customer Updated :");
+		System.out.println("     Customer Number : " + this.Number);
+		System.out.println("     Surname         : " + this.Surname);
+		System.out.println("     Other Name(s)   : " + this.Other_Names);
+		System.out.println("     Address         : " + this.Address);
+		System.out.println("     Postcode        : " + this.Postcode);
+		System.out.println("     Tel Number      : " + this.Tel_Number);
+		System.out.println("");
+	}
+}
+</pre>
+</body>
+</html>

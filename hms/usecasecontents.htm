@@ -1,0 +1,79 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+
+<script language="javascript" type="text/javascript">
+<!--
+function selectURL()
+{
+	pageref = document.getElementById('tagname').value;
+
+	if (pageref != "nopage")
+	{
+		parent.frames.usecaseind.location.href = pageref;
+	}
+}
+-->
+</script>
+
+</head>
+
+<body>
+
+<table border=0>
+<tr valign=top>
+<td width=200>
+<div id="contents" style="font-weight:bold; color:#0000ff">
+Select A Use Case :
+</div>
+</td>
+<td align=center width=200>
+<form name="htmltags">
+<select name="tagname" id="tagname" size=1 onchange="selectURL()">
+<option value="usecasebody.htm">
+<option value="nopage">--------------------------------Hotel Use Cases--------------------------------
+<option value="nopage">
+<option value="uc/newcustomer.htm">Register A New Customer
+<option value="uc/bookroom.htm">Book A Room 
+<option value="uc/cancelroom.htm">Guest Cancels A Room Booking 
+<option value="uc/checkin.htm">Guest Checks In 
+<option value="uc/noturnup.htm">Guest Does Not Turn Up For A Room Booking 
+<option value="uc/checkout.htm">Guest Checks Out 
+<option value="uc/bill.htm">Guest Queries Current Total Of His/Her Bill 
+<option value="nopage">
+<option value="nopage">-----------------------------Restaurant Use Cases---------------------------
+<option value="nopage">
+<option value="uc/booktable.htm">Guest Reserves A Table In the Restaurant 
+<option value="uc/canceltable.htm">Guest Cancels A Restaurant Booking 
+<option value="uc/checkinres.htm">Guest Arrives For A Restaurant Booking 
+<option value="uc/noturnupres.htm">Guest Does Not Turn Up For A Restaurant Reservation 
+<option value="uc/order.htm">Guest Orders Food/Drink in the Restaurant 
+<option value="uc/checkoutres.htm">Guest Leaves The Restaurant After Eating 
+<option value="nopage">
+<option value="nopage">-------------------------------Manager Use Cases----------------------------
+<option value="nopage">
+<option value="uc/moveguest.htm">Move Guest To Another Room 
+<option value="uc/ctarone.htm">Change Tariff For A Particular Room 
+<option value="uc/ctarall.htm">Change Tariff For All The Rooms Of A Particular Standard 
+<option value="uc/complnt.htm">Guest Has A Compliment/Complaint 
+<option value="uc/removeitem.htm">Remove An Item From A Guest's Bill 
+<option value="uc/refund.htm">Refund An Item To A Guest 
+<option value="uc/cnumtables.htm">Change Number Of Tables In The Restaurant 
+<option value="uc/srbook.htm">Show Room Booking For Week X 
+<option value="uc/stbook.htm">Show Table Reservations For Week X 
+<option value="uc/stakr.htm">Show Takings Of Hotel (Rooms Only) For Week X 
+<option value="uc/stakt.htm">Show Takings Of Restaurant For Week X 
+<option value="uc/stakh.htm">Show Takings Of Entire Hotel For Week X 
+<option value="nopage">
+<option value="nopage">----------------------------Maintenance Use Cases-------------------------
+<option value="nopage">
+<option value="uc/clean.htm">Clean Room 
+<option value="uc/repair.htm">Repair To Room 
+<option value="uc/fault.htm">Log A Fault 
+<option value="nopage">
+</select>
+</form></td>
+</tr>
+</table>
+</html>

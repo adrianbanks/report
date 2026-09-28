@@ -1,0 +1,431 @@
+<html>
+<head>
+<title> ANBMTS - Motion Tracking Using Java (©2000-2001 Adrian Banks)</title>
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="stylesheet" type="text/css" href="report.css">
+
+<body topmargin=0 leftmargin=0 marginwidth=0 marginheight=0>
+
+<table border=0 cellpadding=5 cellspacing=2 width=100% height=100%>
+<tr width=100%><td width=225 height=115 valign=top>
+<div align=center>
+<a href="anbmts.htm">
+<img src="logo.gif" width=180 height=80 border=0></a>
+</div>
+<br>
+<br>
+<div id="contents" align=center>
+<big>
+<u>
+<strong>
+Contents
+</strong>
+</u>
+</big>
+</div>
+<div id="contents">
+<ul>
+<li><a href="summary.htm">Summary</a><br><br></li>
+<li><a href="introduction.htm">Introduction</a><br><br></li>
+<li><a href="design.htm">Design &amp; Specification</a><br><br></li>
+<li><a href="implementation.htm">Implementation &amp; Testing</a><br><br></li>
+<li><a href="management.htm">Project Management</a><br><br></li>
+<li><a href="conclusions.htm">Conclusions</a><br><br></li>
+<li><a href="appendix.htm">Appendix</a><br><br></li>
+<li><a href="bibliography.htm">Bibliography</a><br><br></li>
+</ul>
+<br>
+<br>
+<br>
+<div id="copyright" style="font-size:7pt">
+©2000-2001 Adrian Banks
+<br>
+Last Updated : 18th May 2001
+</div>
+</div>
+</td><td valign=top style="text-align:justify">
+<!--main content start here-->
+
+<div id="smallheading">
+Test Image Data
+</div>
+<br>
+<table border=0 cellpadding=0 cellspacing=5>
+<tr><td>
+<img src="testdata.gif" alt="Sample image data - nine differently positioned balls">
+</td><td valign=top>
+<br>
+<br>
+<br>
+<div align=left style="font-style:italic">
+Sample image data - nine differently positioned balls
+</div>
+<br>
+<br>
+<br>
+<br>
+Test data was acquired using the "Philips VGA Digital Camera" by capturing pictures of a real tennis ball in motion on a white background. Each position of the ball satisfies the criteria set down on the motion of the ball (see <span style="font-style:italic">"Assumptions & Design Restrictions"</span> in the <span style="font-style:italic">"Design & Specification"</span> scetion), except the last. This was included as to provide a "stray" ball that did not follow along a path as with the other images of the ball.
+<br>
+<br>
+Each image is 350 by 285 pixels in physical size (45.6Kbytes memory) and can be fully processed by the edge detection algorithm in less than half a second.
+</td></tr>
+</table>
+<br>
+<br>
+<div id="smallheading">
+Camera Resolution
+</div>
+<br>
+The camera was positioned at a perpendicular distance of 216cm (85") from a flat wall and the physical view dimensions were measured.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="camwall.gif">
+</div>
+<br>
+<div align=center>
+<table border=1 cellpadding=3 cellspacing=0>
+<tr><td align=center>
+Camera Resolution
+<br>
+(x <span style="font-family:Arial; font-size:10">x</span> y pixels)
+</td><td align=center>
+Distance d
+<br>
+(cm)
+</td><td align=center>
+Physical View Width
+<br>
+(cm)
+</td><td align=center>
+Physical View Height
+<br>
+(cm)
+</td><td align=center>
+Image Size
+<br>
+(bytes)
+</td></tr>
+<tr><td align=center>
+128 <span style="font-family:Arial; font-size:10">x</span> 96
+</td><td align=center>
+216.0
+</td><td align=center>
+106.7
+</td><td align=center>
+76.2
+</td><td align=center>
+18432
+</td></tr>
+<tr><td align=center>
+160 <span style="font-family:Arial; font-size:10">x</span> 120
+</td><td align=center>
+216.0
+</td><td align=center>
+165.1
+</td><td align=center>
+114.3
+</td><td align=center>
+28800
+</td></tr>
+<tr><td align=center>
+176 <span style="font-family:Arial; font-size:10">x</span> 178
+</td><td align=center>
+216.0
+</td><td align=center>
+147.3
+</td><td align=center>
+116.8
+</td><td align=center>
+38016
+</td></tr>
+<tr><td align=center>
+260 <span style="font-family:Arial; font-size:10">x</span> 144
+</td><td align=center>
+216.0
+</td><td align=center>
+121.9
+</td><td align=center>
+86.4
+</td><td align=center>
+63360
+</td></tr>
+<tr><td align=center>
+320 <span style="font-family:Arial; font-size:10">x</span> 240
+</td><td align=center>
+216.0
+</td><td align=center>
+165.1
+</td><td align=center>
+116.8
+</td><td align=center>
+115200
+</td></tr>
+<tr><td align=center>
+352 <span style="font-family:Arial; font-size:10">x</span> 288
+</td><td align=center>
+216.0
+</td><td align=center>
+149.9
+</td><td align=center>
+119.4
+</td><td align=center>
+152064
+</td></tr>
+<tr><td align=center>
+640 <span style="font-family:Arial; font-size:10">x</span> 480
+</td><td align=center>
+216.0
+</td><td align=center>
+165.1
+</td><td align=center>
+119.4
+</td><td align=center>
+460800
+</td></tr>
+</table>
+</div>
+<br>
+<br>
+These measurements were then used to calculate the corresponding angles of projection of the different camera resolutions.
+<br>
+<br>
+<div align=center>
+<img src="camwall1.gif">
+</div>
+<br>
+<br>
+<br>
+<div align=center>
+<table border=1 cellpadding=3 cellspacing=0>
+<tr><td align=center>
+Camera Resolution
+<br>
+(x <span style="font-family:Arial; font-size:10">x</span> y pixels)
+</td><td align=center>
+Horizontal Angle
+<br>
+(°)
+</td><td align=center>
+Vertical Angle
+<br>
+(°)
+</td></tr>
+<tr><td align=center>
+128 <span style="font-family:Arial; font-size:10">x</span> 96
+</td><td align=center>
+13.9
+</td><td align=center>
+6.7
+</td></tr>
+<tr><td align=center>
+160 <span style="font-family:Arial; font-size:10">x</span> 120
+</td><td align=center>
+20.9
+</td><td align=center>
+10.0
+</td></tr>
+<tr><td align=center>
+176 <span style="font-family:Arial; font-size:10">x</span> 178
+</td><td align=center>
+18.8
+</td><td align=center>
+10.2
+</td></tr>
+<tr><td align=center>
+260 <span style="font-family:Arial; font-size:10">x</span> 144
+</td><td align=center>
+15.8
+</td><td align=center>
+7.6
+</td></tr>
+<tr><td align=center>
+320 <span style="font-family:Arial; font-size:10">x</span> 240
+</td><td align=center>
+20.9
+</td><td align=center>
+10.2
+</td></tr>
+<tr><td align=center>
+352 <span style="font-family:Arial; font-size:10">x</span> 288
+</td><td align=center>
+19.1
+</td><td align=center>
+10.4
+</td></tr>
+<tr><td align=center>
+640 <span style="font-family:Arial; font-size:10">x</span> 480
+</td><td align=center>
+20.9
+</td><td align=center>
+10.4
+</td></tr>
+</table>
+</div>
+<br>
+<br>
+An estimate of 66.0cm was placed on the distance at which the camera would be placed on the final constructed camera rig for the third year part of the project. Using this as correct, calculations were done using basic trigonometry to work out the visible area for each camera resolution.
+<br>
+<br>
+<br>
+<div align=center>
+<table border=1 cellpadding=3 cellspacing=0>
+<tr><td align=center>
+Camera Resolution
+<br>
+(x <span style="font-family:Arial; font-size:10">x</span> y pixels)
+</td><td align=center>
+Height
+<br>
+(cm)
+</td><td align=center>
+View Width
+<br>
+(cm)
+</td><td align=center>
+View Height
+<br>
+(cm)
+</td><td align=center>
+View Area
+<br>
+(cm<sup>2</sup>)
+</td></tr>
+<tr><td align=center>
+128 <span style="font-family:Arial; font-size:10">x</span> 96
+</td><td align=center>
+66.0
+</td><td align=center>
+35.5
+</td><td align=center>
+23.4
+</td><td align=center>
+830.7
+</td></tr>
+<tr><td align=center>
+160 <span style="font-family:Arial; font-size:10">x</span> 120
+</td><td align=center>
+66.0
+</td><td align=center>
+50.5
+</td><td align=center>
+35.1
+</td><td align=center>
+1772.6
+</td></tr>
+<tr><td align=center>
+176 <span style="font-family:Arial; font-size:10">x</span> 178
+</td><td align=center>
+66.0
+</td><td align=center>
+45.0
+</td><td align=center>
+35.6
+</td><td align=center>
+1602.0
+</td></tr>
+<tr><td align=center>
+260 <span style="font-family:Arial; font-size:10">x</span> 144
+</td><td align=center>
+66.0
+</td><td align=center>
+37.3
+</td><td align=center>
+26.4
+</td><td align=center>
+984.7
+</td></tr>
+<tr><td align=center>
+320 <span style="font-family:Arial; font-size:10">x</span> 240
+</td><td align=center>
+66.0
+</td><td align=center>
+50.5
+</td><td align=center>
+35.6
+</td><td align=center>
+1797.8
+</td></tr>
+<tr><td align=center>
+352 <span style="font-family:Arial; font-size:10">x</span> 288
+</td><td align=center>
+66.0
+</td><td align=center>
+45.7
+</td><td align=center>
+36.3
+</td><td align=center>
+1658.9
+</td></tr>
+<tr><td align=center>
+640 <span style="font-family:Arial; font-size:10">x</span> 480
+</td><td align=center>
+66.0
+</td><td align=center>
+50.5
+</td><td align=center>
+36.3
+</td><td align=center>
+1832.2
+</td></tr>
+</table>
+</div>
+<br>
+<br>
+Finally, a resolution of 160x120 was chosen to accommodate both the physical view are of the camera and the size of the image in memory at this resolution. At the height of 66.0cm, this covers approximately one fifth of the total proposed area that the camera will need to cover. This is adequate because the camera will be moving around on the motors on which it is mounted.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Camera Mounting Rig
+</div>
+<br>
+The third year part of the project included the design and construction of a rig suitable for the mounting of the Philips VGA Digital Camera. Pictures of this rig can be seen below.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="rig1.gif">
+<br>
+<br>
+<img src="rig2.gif">
+</div>
+<br>
+<br>
+This camera rig can be controlled via the serial port of a desktop PC. The camera position can be altered by movement of the stepper motors mounted on the rig.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Philips Vesta Pro WebCam
+</div>
+<br>
+The camera chosen for the image capture parts of the project is the Philips VGA Vesta Pro Digital Camera.
+<br>
+<br> 
+This camera is capable of capturing both colour and black and white images at various resolutions.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="camera1.gif" alt="Philips Vesta Pro Webcam">
+<br>
+<br>
+<img src="camera2.gif" alt="Philips Vesta Pro Webcam">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="camera3.gif" alt="Philips Vesta Pro Webcam">
+<br>
+<br>
+<div style="font-style:italic">
+Philips Vesta Pro WebCam
+</div>
+</div>
+<br>
+<br>
+ 
+<!--main content end here-->
+</td></tr>
+</table>
+
+</html>

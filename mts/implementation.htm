@@ -1,0 +1,494 @@
+<html>
+<head>
+<title> ANBMTS - Motion Tracking Using Java (©2000-2001 Adrian Banks)</title>
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="stylesheet" type="text/css" href="report.css">
+
+<body topmargin=0 leftmargin=0 marginwidth=0 marginheight=0>
+
+<table border=0 cellpadding=5 cellspacing=2 width=100% height=100%>
+<tr width=100%><td width=225 height=115 valign=top>
+<div align=center>
+<a href="anbmts.htm">
+<img src="logo.gif" width=180 height=80 border=0></a>
+</div>
+<br>
+<br>
+<div id="contents" align=center>
+<big>
+<u>
+<strong>
+Contents
+</strong>
+</u>
+</big>
+</div>
+<div id="contents">
+<ul>
+<li><a href="summary.htm">Summary</a><br><br></li>
+<li><a href="introduction.htm">Introduction</a><br><br></li>
+<li><a href="design.htm">Design &amp; Specification</a><br><br></li>
+<li><a href="implementation.htm">Implementation &amp; Testing</a><br><br></li>
+<li><a href="management.htm">Project Management</a><br><br></li>
+<li><a href="conclusions.htm">Conclusions</a><br><br></li>
+<li><a href="appendix.htm">Appendix</a><br><br></li>
+<li><a href="bibliography.htm">Bibliography</a><br><br></li>
+</ul>
+<br>
+<br>
+<br>
+<div id="copyright" style="font-size:7pt">
+©2000-2001 Adrian Banks
+<br>
+Last Updated : 18th May 2001
+</div>
+</div>
+</td><td valign=top style="text-align:justify">
+<!--main content start here-->
+
+<div id="smallheading">
+Project Achievement
+</div>
+<br>
+The project has had various stages of success. Firstly, the edge detection part of the project has been developed to work quickly and effectively for any image. A full image with over 19000 pixels (160 by 120 pixel dimensions) can be scanned and edges calculated in less the half a second. This enables the system to grab the edges from an image in real-time, without a considerable delay while the image is analysed.
+<br>
+<br>
+Secondly, basic motion tracking has been achieved by using the circle comparison technique described earlier. This has not however been very successful in testing with the system detecting the new location of the circle with a low success rate. With more time, this basic method could be developed to be more sophisticated to give a higher circle detection success rate.
+<br>
+<br>
+Thirdly, for reasons discussed later, the task of capturing a live video feed was transferred from the third year part to the fourth year part of the project. This was successful using the Java Media Framework, despite extremely limited documentation and support for this newly developed extension to the Java language.
+<br>
+<br>
+<br>
+<blockquote>
+<blockquote>
+<span style="text-decoration:underline">Third Year Project</span>
+<br>
+<br>
+The third year part of the project has been successful to the extent that the camera has been mounted on the mounting rig and is controllable on two dimensional axes via the serial port of a PC using a microcontroller (an Atmel AT89C52) to directly translate control characters into movement signals. This is controlled by a graphical user interface coded in Java.
+<br>
+<br>
+Both of these components (the graphical user interface and the microcontroller circuit) were successfully designed and coded as part of the third year project.
+<br>
+<br>
+Access to the video feed has not been achieved as part of the third year project due to problems discussed later.
+</blockquote>
+</blockquote>
+<br>
+<div id="smallheading">
+Problems Encountered
+</div>
+<br>
+Throughout the course of the project, several problems have been encountered that have had to be accommodated.
+<br>
+<br>
+Firstly, the main problem of both the third year and fourth year projects was that the video feed from the camera was not available when expected in the project plan. This was due to java language and more specifically support and driver problems associated with the webcam and the Java Media Framework. This has been worked around by not using the webcam to capture the image data. Instead, a series of still images are used to simulate a series of frames from a live video feed. This works adequately for testing purposes. Meanwhile, the camera code was developed without further hindrance to the rest of the project.
+<br>
+<br>
+Secondly, the networking side of the project has been eliminated, mainly due to time restrictions. Control signals will be determined by image analysis and simply displayed to the user. With further time, this could be developed.
+<br>
+<br>
+Finally, there was a change to the third year part of the project. The layout of the camera's mounting was changed to enable standardised plans views with the circle retained at the centre to keep its size constant whist the camera is moving. The camera instead is mounted on two tracks to enable it to move over the whole area of the track below (see <span style="font-style:italic">"Camera Mounting Rig"</span> section in the Appendix).
+<br>
+<br>
+<br>
+<div id="smallheading">
+Algorithms
+</div>
+<br>
+Apart from the graphical user interface, the main areas of the project that needed to be programmed were the image handling, edge detection and motion tracking aspects of the project.
+<br>
+<br>
+<br>
+<span style="text-decoration:underline">Image Handling</span>
+<br>
+<br>
+The image handling routine loads in the initial images to be analysed by the system and stores them in an array of <span style="font-family:Courier New">Image</span> objects. 
+<br>
+<blockquote>
+<pre>
+for (i = 0; i < NUM_IMAGES; i++)
+{
+	images [i] = toolkit.getImage(imgname[i]);
+	tracker.addImage(images[i],0);
+
+	try
+	{
+		tracker.waitForAll();
+	}
+	catch (InterruptedException exc) {}
+
+	while (!tracker.checkAll())
+	{
+		System.out.println("Please wait.......");
+	}
+
+	if ((images[i].getWidth(this) > IMAGE_WIDTH) 
+				|| (images[i].getHeight(this) > IMAGE_HEIGHT))
+	{
+		images[i] = images[i].getScaledInstance(IMAGE_WIDTH,IMAGE_HEIGHT,0);
+	}
+}
+</pre>
+</blockquote>
+<br>
+To do this, the <span style="font-family:Courier New">MediaTracker</span> class is used. This ensures that the application waits for the image to be fully loaded before proceeding. If this was not to happen, memory problems may occur when accessing the stored images. Once the images are successfully loaded, they are rescaled if necessary to the preset size of the <span style="font-family:Courier New">ImagePane</span> class using the <span style="font-family:Courier New">getScaledInstance()</span> method of the Image class to return a new re-scaled image with the correct dimensions.
+<br>
+<br>
+<br>
+<span style="text-decoration:underline">Pixel Colour Difference</span>
+<br>
+<br>
+To perform both edge detection and motion tracking it is necessary to analyse pairs of pixels from within an image to perform pixel colour difference analysis on them. This is done in a method of the <span style="font-family:Courier New">ImagePane</span> class designed specifically for this purpose, which is inherited by both the <span style="font-family:Courier New">IPSetup</span> and the <span style="font-family:Courier New">IPMotion</span> classes (hence the <span style="font-family:Courier New">protected</span> declaration of the function).
+<br>
+<blockquote>
+<pre>
+protected boolean handleSinglePixel(int pixel)
+{
+	alpha = (pixel >> 24) & 0xff;
+	red   = (pixel >> 16) & 0xff;
+	green = (pixel >>  8) & 0xff;
+	blue  = (pixel      ) & 0xff;
+ 
+	redDifference = (redStored - red) * (redStored - red);
+	blueDifference = (blueStored - blue) * (blueStored - blue);
+	greenDifference = (greenStored - green) * (greenStored - green);
+ 
+	totalDifference = redDifference + blueDifference + greenDifference;
+	colourDifference = Math.pow(totalDifference,0.5);
+ 
+	redStored = red;
+	greenStored = green;
+	blueStored = blue;
+
+	if (colourDifference > IPthreshold)
+	{
+		return true;
+	}
+ 
+	return false;
+}
+</pre>
+</blockquote>
+<br>
+This works by analysing the colours of two adjacent pixels and performing the three-dimensional Pythagorean calculation as described earlier. This gives the distance between the colours of the two pixels when represented on a three-dimensional coordinate system (using their red, green and blue components as the axes). This distance is then compared against a threshold value and a <span style="font-family:Courier New">boolean</span> returned to indicate whether an edge has been detected. This threshold value can be altered during run-time to allow sensitivity adjustments to be made.
+<br>
+<br>
+<br>
+<span style="text-decoration:underline">Edge Detection</span>
+<br>
+<br>
+The edge detection routine uses the inherited <span style="font-family:Courier New">handleSinglePixel()</span> method from the <span style="font-family:Courier New">ImagePane</span> class as well as a <span style="font-family:Courier New">findEdges()</span> method belonging to the <span style="font-family:Courier New">IPSetup</span> class.
+<br>
+<blockquote>
+<pre>
+public void findEdges()
+{
+	for (j = 0; j < bufferedImage.getHeight(); j++)
+	{
+		for (i = 0; i < bufferedImage.getWidth(); i++)
+		{
+			if ((handleSinglePixel(bufferedImage.getRGB(i,j)) == true) 
+								&& (i != 0))
+			{
+				bufferedImage.setRGB(i,j,5435934);
+				blackBufferedImage.setRGB(i,j,5435934);
+			}
+		}
+	}
+
+	for (j = 0; j < bufferedImage.getWidth(); j++)
+	{
+		for (i = 0; i < bufferedImage.getHeight(); i++)
+		{
+			if ((handleSinglePixel(bufferedImage.getRGB(j,i)) == true) 
+								&& (j != 0))
+			{
+				bufferedImage.setRGB(j,i,5435934);
+				blackBufferedImage.setRGB(j,i,5435934);
+			}
+		}
+	}
+
+	repaint();
+}
+</pre>
+</blockquote>
+<br>
+To do the edge detection, the image is first scanned horizontally and the pixel colour difference routine called with each adjacent pair of pixels in the image as arguments. This is then repeated vertically. Once completed, the edges can be seen on the image since they are plotted using the <span style="font-family:Courier New">setRGB()</span> method of the <span style="font-family:Courier New">BufferedImage</span> class during the scanning operation.
+<br>
+<br>
+<br>
+<span style="text-decoration:underline">Motion Tracking</span>
+<br>
+<br>
+The motion tracking routine also uses the inherited <span style="font-family:Courier New">handleSinglePixel()</span> method from the <span style="font-family:Courier New">ImagePane</span> class as well as a <span style="font-family:Courier New">trackMotion()</span> method belonging to the <span style="font-family:Courier New">IPMotion</span> class.
+<br>
+<blockquote>
+<pre>
+public Circle trackMotion(Image image, Circle circle)
+{
+	// Do a dummy run to set the variables correctly
+	handleSinglePixel(tempBufferedImage.getRGB(circle.getCentreX(),circle.getCentreY()));
+
+	while (timeout < ((int) ((circle.getDiameter() / 2) * 1.1)))
+	{
+		if (handleSinglePixel(tempBufferedImage.getRGB(circle.getCentreX()
+						+ timeout,circle.getCentreY())) == 1)
+		{
+			tempBufferedImage.setRGB(circle.getCentreX() + timeout,
+							circle.getCentreY(),5435934);
+		}
+
+		timeout++;
+	}
+
+	while (timeout < ((int) ((circle.getDiameter() / 2) * 1.1)))
+	{
+		if (handleSinglePixel(tempBufferedImage.getRGB(circle.getCentreX()
+						+ timeout,circle.getCentreY())) == 1)
+		{
+			tempBufferedImage.setRGB(circle.getCentreX()
+						+ timeout,circle.getCentreY(),5435934);
+		}
+
+		timeout--;
+	}
+
+	// once the four edges have been found, do maths and create 
+	//  a circle to return with the location of the position
+	//   of the circle in it
+
+	repaint();
+
+	return paintedCircle;
+}
+</pre>
+</blockquote>
+To do motion tracking, the image is first scanned horizontally starting from the centre of the circle in the previous frame of the sequence of images until an edge is detected on both the left and right sides of the starting point. The new x-axis centre location can then be calculated from these measured distances. This is then repeated vertically to find the new y-axis centre position.
+<br>
+<br>
+<br>
+<span style="text-decoration:underline">Video Capture</span>
+<br>
+<br>
+The video capture code utilises the relatively new Java Media Framework extension to the Java language to interface successfully with external media hardware attached to the PC. 
+<br>
+<br>
+To capture images from the camera, the <span style="font-family:Courier New">jmapps.ui.PlayerFrame</span> class first needs to be extended. This is a core Java Media Framework class that creates a frame suitable for display of a live video feed. An instance of the WebCam class can then be created and the <span style="font-family:Courier New">captureMedia()</span> method called to capture a video feed.
+<br>
+<blockquote>
+<pre>
+private void captureMedia()
+{ 
+	Format formats []; 
+
+	String nameCaptureDeviceVideo = "vfw:Philips VGA Digital Camera (Vesta):0";
+
+	CaptureDeviceInfo deviceInfo = 
+			CaptureDeviceManager.getDevice(nameCaptureDeviceVideo);
+
+	VideoFormat videoFormat = null;
+	formats = deviceInfo.getFormats();
+
+	videoFormat = (VideoFormat) formats[1];
+
+	dataSource = JMFUtils.createCaptureDataSource (null, null, 
+					nameCaptureDeviceVideo, videoFormat); 
+
+	if (dataSource == null)
+	{ 
+		JOptionPane.showMessageDialog(this, "1: Could not connect 
+			to camera\nNot Installed or not plugged in", "Camera 
+				Error", JOptionPane.ERROR_MESSAGE); 
+
+		System.exit(1); 
+	} 
+	else
+	{ 
+		FormatControl control = ((CaptureDevice)dataSource).getFormatControls()[0]; 
+
+		videoFormat = getDesiredFormat(control); 
+		imageTransfer = new ImageTransfer(videoFormat); 
+		control.setFormat(videoFormat); 
+
+		try
+		{ 
+			dataSource.connect(); 
+		} 
+		catch (IOException ioe)
+		{ 
+			JOptionPane.showMessageDialog(this, "2: Could not connect to 
+				camera\n"+ioe, "Camera Error", JOptionPane.ERROR_MESSAGE); 
+
+			System.exit(1); 
+		} 
+
+		open(dataSource); 
+	}
+ 
+	pack(); 
+	setVisible(true); 
+}
+</pre>
+</blockquote>
+<br>
+This method creates an instance of the <span style="font-family:Courier New">DataSource</span> class using the <span style="font-family:Courier New">VideoFormat</span> type of the camera already detected. This <span style="font-family:Courier New">dataSource</span> is then used to connect to the camera by use of an instance of the <span style="font-family:Courier New">MediaPlayer</span> class. The camera is then ready for image capture. Another class, called <span style="font-family:Courier New">ImageTransfer</span>, does the actual video capture. This accesses raw data from the camera, reading it as an array of bytes of data from a buffer that was created as the class was instantiated. This is done by the following lines of code :
+<br>
+<br>
+<blockquote>
+<pre>
+stream.read(buffer); 
+byte[] data = (byte[])buffer.getData();
+</pre>
+</blockquote>
+<br>
+As illustrated by the code snippet above, the task of capturing data from the camera is not a difficult one. The problem area is accessing the camera and initialising it properly so that data can be accessed.
+<br>
+<br>
+Once the data has been accessed and the application closed, the camera must have its resources de-allocated so that other resources may access it. This is done by the <span style="font-family:Courier New">close()</span> method of the <span style="font-family:Courier New">WebCam</span> class.
+<br>
+<blockquote>
+<pre>
+public void close()
+{
+	if (mediaPlayer == null)
+		return;
+
+	try
+	{ 
+		dataSource.stop(); 
+	}
+	catch (IOException ee)
+	{
+		System.out.println("ERROR - Could not close capture device");
+	}
+
+	dataSource.disconnect(); 
+	dataSource = null;
+
+	mediaPlayer.stopAndDeallocate();
+	mediaPlayer = null;
+}
+</pre>
+</blockquote>
+<br>
+This method stops the <span style="font-family:Courier New">dataSource</span> from allowing access to the camera and disconnects from it. The <span style="font-family:Courier New">dataSource</span> is then set to null to avoid future errors. The <span style="font-family:Courier New">mediaPlayer</span> instance is then de-allocated by calling its <span style="font-family:Courier New">stopAndDeallocate()</span> method. This is also set to null.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Data Storage
+</div>
+<br>
+Because the main priority of the project is to do real-time motion tracking, speed was the most important factor when considering how to design any aspect of the project. This posed a problem when addressing how to store the position of the edges within an image to be used when analysing the next frame of the sequence. If every edge was stored, some kind of storage medium would have to be implemented such as a vector or a hash table. Whilst these provide an economical method of dynamically storing large amounts of data, they are relatively slow in the fact that they have to be accessed via their own methods. When these methods are called, at a low level, the stack pointer has to be repositioned to access the data contained in them whilst the method to retrieve the required information is executed. This slows down the execution of the program, especially if the data store is being accessed thousands of times per image.
+<br>
+<br>
+Instead of storing the entire data for the location of the edges within an image, it was decided to only store the location of the circle in the previous frame. This involves storing just three integers : the x-coordinate of the centre, the y-coordinate of the circle, the diameter of the circle. This reduces the memory requirements of the application, freeing up more resources to do real-time processing. Scanning on two single perpendicular lines is adequate to provide enough information to now calculate the position of the circle in the next frame in the sequence. This process involves very little in the way of resources and is extremely quick.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Graphical User Interface
+</div>
+<br>
+To enable an application to be developed that would detect edges within an image and perform some sort of motion tracking, a graphical user interface (GUI) had to be coded to display the results of the image analysis in. Figure 3.5a shows the graphical user interface for the system.
+<br>
+<br>
+<br>
+<div align=center>
+<img src="gui.gif" alt="Figure 3.5ab : GUI of the system showing the results of edge detection anlysis">
+</div>
+<br>
+<div align=center style="font-style:italic">
+Figure 3.5ab : GUI of the system showing the results of edge detection anlysis
+</div>
+<br>
+This graphical user interface is not intended to be comprehensive for the combined projects, but is simply used to demonstrate the algorithms designed for the image analysis. Because it is stand-alone, however, it could easily be incorporated with the third year part of the project to provide a single user interface as part of a combined system.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Testing
+</div>
+<br>
+The system is fully event driven and the graphical user interface has been tested extensively during development.
+<br>
+<br>
+File checking is in place to ensure that the sample images are found, but if not, the error will be handled successfully by the system.
+<br>
+<br>
+Further error checking is in place throughout the code where necessary, but since the initial aim of the project was to produce class files suitable for incorporation into the third year graphical user interface, no extensive error checking is performed.
+<br>
+<br>
+Testing of the edge detection and motion tracking algorithm algorithms has been done (using the test image data shown in the <span style="font-style:italic">"Test Image Data"</span> section in the Appendix) and the algorithms perform adequately.
+<br>
+<br>
+<br>
+<blockquote>
+<span style="text-decoration:underline">Execution Time Requirements</span> 
+<br>
+<br>
+Analysis was done during a typical execution of the application using a commercial Java Profiler called "JProbe". This reveals internal information about Java programs such as method calls and method time details. The results of analysis on the main methods involved with the edge detection and motion tracking algorithms are show in Table 3.6a.
+<br>
+<br>
+<br>
+<div align=center>
+<table title="Table 3.6a : results of analysis of the application using JProbe" border=1 cellpadding=4 cellspacing=0>
+<tr><td align=center>
+Method Name
+</td><td align=center>
+Number Of Method Calls
+</td><td align=center>
+Cumulative Method Time (%)
+</td></tr>
+<tr><td>
+ImagePane.handleSinglePixel()
+</td><td align=center>
+38624
+</td><td align=center>
+0.1
+</td></tr>
+<tr><td>
+BufferedImage.getRGB()
+</td><td align=center>
+38624
+</td><td align=center>
+0.7
+</td></tr>
+<tr><td>
+IPSetup.findEdges()
+</td><td align=center>
+1
+</td><td align=center>
+0.8
+</td></tr>
+<tr><td>
+IPMotion.trackMotion()
+</td><td align=center>
+14
+</td><td align=center>
+1.3
+</td></tr>
+</table>
+</div>
+<br>
+<div align=center style="font-style:italic">
+Table 3.6a : results of analysis of the application using JProbe
+</div>
+<br>
+<br>
+<br>
+As can be seen from the results of the analysis, the motion tracking algorithm is the most resource-hungry. This could be expected due to the nature of what it is actually doing. The surprising outcome of this analysis is that the <span style="font-family:Courier New">handleSinglePixel()</span> method of the ImagePane class only takes up 0.1% of the total time of execution, even though it is called nearly forty-thousand times during execution.
+<br>
+<br>
+This analysis shows that the algorithms have been designed well for speed and work effectively during execution without taking up too many system resources.
+<br>
+<br>
+</blockquote>
+
+<!--main content end here-->
+</td></tr>
+</table>
+
+</html>

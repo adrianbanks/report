@@ -1,0 +1,110 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+
+<body>
+
+<div id="smallheading">
+Overview
+</div>
+<br>
+Any hotel needs to keep up-to-date accurate records of a variety of informations to ensure the day to day efficiency of the management of the hotel and its guests. In the past, this was all recorded on paper, taking up lots of storage space and taking an inefficient amount of time to look up or update and information. In the modern age of technology, just one computer can manage the whole task very effectively. This, however, is not adequate for a large hotel (or a chain of hotels) where it would be impractical to have only one computer to do manage all of the data. Simply adding more computers does not solve the problem because conflicts of information would arise (for example, what would happen if two different people booked one particular room on two separate computers at the same time?).
+<br>
+<br>
+The solution to this is to have one comprehensive data store for all of the information that can be accessed and updated by a number of computers. This system could then make use of a network to enable the terminal machines (the computers accessing the data store) to be located anywhere in the hotel, or even anywhere in the world using the internet as the network structure.
+<br>
+<br>
+This networked solution has many advantages since more than one terminal can access the stored data, yet the data still has integrity because there is only one copy of it which cannot hold conflicts. Also, in the case of a chain of hotels, bookings could be made for any hotel in the chain from any terminal in any of the hotels if all of the data for all of the hotels was stored centrally on one main server.
+<br>
+<br>
+To implement this networked solution, two applications need to be constructed :
+<br>
+<br>
+<blockquote>
+<ul>
+<li>a main server program to store all of the hotel data and to send/receive data over the network</li>
+<br>
+<br>
+<li>a client program to act as a graphical user interface on a terminal, capable of querying data stored on the server and sending updates to the data over the network</li>
+</ul>
+</blockquote>
+<br>
+<div id="smallheading">
+Choice Of Platform And Language
+</div>
+<br>
+Before coding of the client and server applications commenced, a suitable target operating system had to be chosen to ensure compatibility from the start.
+<br>
+<br>
+"Microsoft Windows®" has become widespread throughout the world and is by far the most common operating system in use today. Because of this, Windows® (and in particular the latest releases of "Windows 98®" and "Windows 2000®") was chosen as the target operating system for the Hotel Management System.
+<br>
+<br>
+A suitable programming language also had to be chosen to develop the Hotel Management System. Java was selected because of its extensive library of network-oriented functions. This also added to the portability of the completed product to other operating systems since Java is virtually platform-independent (if any extended libraries are avoided).
+<br>
+<br>
+<br>
+<div id="smallheading">
+Similar Products
+</div>
+<br>
+Research into similar products has provided three pieces of software :
+<br>
+<br>
+<blockquote>
+<div style="text-decoration:underline">
+KarenSoft Hotel Management System
+</div>
+<br>
+This is a commercial hotel management system with many detailed features. It cannot run on a network.
+<br>
+<br>
+<br>
+<div style="text-decoration:underline">
+MotelMax Hotel Motel Manager
+</div>
+<br>
+This is a basic hotel management system which cannot run on a network.
+<br>
+<br>
+<br>
+<div style="text-decoration:underline">
+HotelQ Front Office
+</div>
+<br>
+This is a detailed hotel management system with many functions which has not been designed to run on a network, but can be installed on one. Only one user is allowed whilst running on a network.
+</blockquote>
+<br>
+As can be seen from above, networked hotel management systems are not easily available which incorporate multi-user remote terminals.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Initial Objectives
+</div>
+<br>
+The initial goal of the project was to produce a piece of software capable of recording room bookings and reservations for up to one year in advance, and table bookings in the hotel's restaurant for up to one year ahead also. The software should also be able to manage the daily routine of the hotel (i.e. checking in and out, room cleaning, etc.).
+<br>
+<br>
+Information on the length of the customer's stay in the hotel was to be recorded upon reserving a room as well as their own personal information (i.e. full name, address and telephone number). A sequentially incrementing customer number was also to be allocated to every new customer upon their first reservation which could then be used to reserve rooms in future circumstances to cut down on customer inconvenience in completing forms when reserving a room. A record of the customer's bill was also to be kept for payment upon departure.
+<br>
+<br>
+Customers reserving a table in the restaurant could do so with their customer number to aid the speed of booking a table. This would also allow the restaurant to add the bill of the meal directly on to the bill for the customer's room (i.e. only one bill per stay needed to be paid which would encompass all of the costs incurred during the stay).
+<br>
+<br>
+The software should have a comprehensive, user-friendly graphical user interface.
+<br>
+<br>
+<br>
+<div id="smallheading">
+Updated Objectives
+</div>
+<br>
+The final objectives remain the same except for one addition. Whilst developing the software, a booking number was added to compliment the idea of the customer number, adding to the functionality of the design of the system. This aids in the process of allocating more than one booking to a customer, but keeps each individual booking separate from the others for that customer.
+<br>
+<br>
+<br>
+
+</body>
+</html>

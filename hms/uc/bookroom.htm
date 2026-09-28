@@ -1,0 +1,99 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="report.css">
+</head>
+
+<body>
+
+<div id="mediumheading">
+Use Case : Book A Room
+</div>
+<br>
+<table border=1 cellpadding=5 cellspacing=0>
+<tr><td width=20>
+&nbsp;
+</td><td align=center width=300>
+<div id="smallheading">
+Actor Action
+</div>
+</td><td width=20>
+&nbsp;
+</td><td align=center width=300>
+<div id="smallheading">
+System Response
+</div>
+</td></tr>
+<tr><td align=center>
+1
+</td><td width=300>
+Customer approaches the reception desk and requests a {basic/luxury} room for {1/2} people for {x} nights. Customer also states any special requirements (i.e. Disabled access).
+</td><td align=center>
+&nbsp;
+</td><td width=300>
+&nbsp;
+</td></tr>
+<tr><td align=center>
+2
+</td><td width=300>
+Receptionist enters details of the customer's request.
+</td><td align=center>
+3
+</td><td width=300>
+Check for an available room meeting the required specification.
+</td></tr>
+<tr><td align=center>
+4
+</td><td width=300>
+Receptionist enters the customer's customer number.
+</td><td align=center>
+5
+</td><td width=300>
+Check the customer number is a valid customer number.
+</td></tr>
+<tr><td align=center>
+6
+</td><td width=300>
+Receptionist takes a deposit (one night's rate).
+</td><td align=center>
+7
+</td><td width=300>
+Print out a receipt for the deposit and print out a confirmation of the booking. Log the booking.
+</td></tr>
+<tr><td align=center>
+8
+</td><td width=300>
+Receptionist gives the receipt, booking confirmation and the keys (only if the booking starts now) for the room to the guest.
+</td><td align=center>
+&nbsp;
+</td><td width=300>
+&nbsp;
+</td></tr>
+<tr><td align=center>
+9
+</td><td width=300>
+Guest leaves the desk.
+</td><td align=center>
+&nbsp;
+</td><td width=300>
+&nbsp;
+</td></tr>
+</table>
+<br>
+<div id="smallheading" style="font-size:12pt">
+Alternate Cases :
+</div>
+<br>
+<ul>
+<li>(1) If the customer telephones, the requirements are taken over the phone.
+<li>(3) If no room of the specified type is available, issue a room of another type and adjust the price accordingly. If there is no room at all, take a contact number.
+<li>(5) If the customer number is not valid, or the customer does not have one, initiate REGISTER A NEW CUSTOMER.
+<li>(8) If the customer telephones, send the receipt of payment and the booking confirmation through the post.
+<li>(9) Guest hangs up the telephone.
+</li>
+</ul>
+<br>
+<br>
+
+</body>
+</html>

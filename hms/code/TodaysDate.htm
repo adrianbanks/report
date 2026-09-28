@@ -1,0 +1,75 @@
+<html>
+<body>
+<pre>
+import java.util.*;
+
+class TodaysDate
+{
+	public TodaysDate()
+	{
+		int d;
+
+		Date today = new Date();
+
+		date_today = today.getDate();
+
+		month_today = today.getMonth() + 1;
+
+		year_today = today.getYear() + 1900;
+
+		hours_today = today.getHours() + "";
+
+		minutes_today = today.getMinutes() + "";
+
+		if (today.getMinutes() < 10)
+		{
+			minutes_today = "0" + today.getMinutes() + "";
+		}
+
+		seconds_today =	today.getSeconds() + "";
+
+		if (today.getSeconds() < 10)
+		{
+			seconds_today = "0" + today.getSeconds() + "";
+		}
+	}
+
+	public int getDate()
+	{
+		return date_today;
+	}
+
+	public int getMonth()
+	{
+		return month_today;
+	}
+
+	public int getYear()
+	{
+		return year_today;
+	}
+	
+	public void Print()
+	{
+		System.out.println("");
+		System.out.print("  Startup : ");
+		System.out.print(date_today);
+		System.out.print("/");
+		System.out.print(month_today);
+		System.out.print("/");
+		System.out.print(year_today);
+		System.out.print("    ");
+		System.out.print(hours_today);
+		System.out.print(":");
+		System.out.print(minutes_today);
+		System.out.print(":");
+		System.out.println(seconds_today);
+		System.out.println("");
+	}
+
+	private int date_today, month_today, year_today;
+	private String hours_today, minutes_today, seconds_today;
+}
+</pre>
+</body>
+</html>

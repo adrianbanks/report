@@ -1,0 +1,666 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+class RServer
+{
+	//Data Files
+	static final String ROOMDATAFILE = "room.dat";
+	static final String CUSTOMERDATAFILE = "customer.dat";
+	static final String TABLEDATAFILE = "table.dat";
+	static final String ROOMBOOKINGDATAFILE = "roombooking.dat";
+	static final String TABLEBOOKINGDATAFILE = "tablebooking.dat";
+	static final String BILLDATAFILE = "bill.dat";
+
+	//Data stores
+	static Hashtable ht_room;
+	static Hashtable ht_customer;
+	static Hashtable ht_table;
+	static Hashtable ht_roombooking;
+	static Hashtable ht_tablebooking;
+	static Hashtable ht_bill;
+
+	//Number of each object - used for object numbers
+	static int cnumber = 1;
+	static int rnumber = 1;
+	static int tnumber = 1;
+	static int rbnumber = 1;
+	static int tbnumber = 1;
+
+	//Ports for input and output
+	static final int INPORT = 5000;
+	static final int OUTPORT = 5050;
+
+	static ObjectInputStream ObIn;
+	static ObjectOutputStream ObOut;
+
+	static FileInputStream istream;
+	static FileOutputStream ostream;
+	static ObjectInputStream fin;
+	static ObjectOutputStream fout;
+
+	static TodaysDate td;
+
+	public static void main (String[] args) throws IOException, ClassNotFoundException
+	{
+		String tempstring;
+		Room room;
+		Customer customer;
+		Table table;
+		RoomBooking roombooking;
+		TableBooking tablebooking;
+		Bill bill;
+		ObjectType ot;
+
+		System.out.println("");
+		System.out.println("**********************************************");
+		System.out.println("*                                            *");
+		System.out.println("*   ANB Networked Hotel Management System    *");
+		System.out.println("*         (Server Application)               *");
+		System.out.println("*   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    *");
+		System.out.println("*         ©1999-2000 Adrian Banks            *");
+		System.out.println("*                                            *");
+		System.out.println("**********************************************");
+		System.out.println("");
+		System.out.println("  Server IP   : " + InetAddress.getLocalHost().getHostAddress());
+		System.out.println("  Server Name : " + InetAddress.getLocalHost().getHostName());
+
+		//Get today's date
+		td = new TodaysDate();
+		td.Print();
+
+		System.out.println("  Loading Data Files............");
+
+		//Create data stores in memory
+		ht_room = new Hashtable();
+		ht_customer = new Hashtable();
+		ht_table = new Hashtable();
+		ht_roombooking = new Hashtable();
+		ht_tablebooking = new Hashtable();
+		ht_bill = new Hashtable();
+
+		//Load Room Data File
+		try
+		{
+			istream = new FileInputStream(ROOMDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				Room tmp;
+
+				while(true)
+				{
+					tmp = (Room) fin.readObject();
+					ht_room.put(tmp.getNumber() + "",tmp);
+					rnumber++;
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfe)
+		{
+			System.out.println("  (Cannot Find Room Data File)");
+		}
+
+		//Load Customer Data File
+		try
+		{
+			istream = new FileInputStream(CUSTOMERDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				Customer tmp;
+
+				while(true)
+				{
+					tmp = (Customer) fin.readObject();
+					ht_customer.put(tmp.getNumber() + "",tmp);
+					cnumber++;
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfea)
+		{
+			System.out.println("  (Cannot Find Customer Data File)");
+		}
+
+		//Load Table Data File
+		try
+		{
+			istream = new FileInputStream(TABLEDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				Table tmp;
+
+				while(true)
+				{
+					tmp = (Table) fin.readObject();
+					ht_table.put(tmp.getNumber() + "",tmp);
+					tnumber++;
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfea)
+		{
+			System.out.println("  (Cannot Find Table Data File)");
+		}
+
+		//Load Room Booking Data File
+		try
+		{
+			istream = new FileInputStream(ROOMBOOKINGDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				RoomBooking tmp;
+
+				while(true)
+				{
+					tmp = (RoomBooking) fin.readObject();
+					ht_roombooking.put(tmp.getNumber() + "",tmp);
+					rbnumber++;
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfea)
+		{
+			System.out.println("  (Cannot Find Room Booking Data File)");
+		}
+
+		//Load Table Booking Data File
+		try
+		{
+			istream = new FileInputStream(TABLEBOOKINGDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				TableBooking tmp;
+
+				while(true)
+				{
+					tmp = (TableBooking) fin.readObject();
+					ht_tablebooking.put(tmp.getNumber() + "",tmp);
+					tbnumber++;
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfea)
+		{
+			System.out.println("  (Cannot Find Table Booking Data File)");
+		}
+
+		//Load Bill Data File
+		try
+		{
+			istream = new FileInputStream(BILLDATAFILE);
+			fin = new ObjectInputStream(istream);
+
+			try
+			{
+				Bill tmp;
+
+				while(true)
+				{
+					tmp = (Bill) fin.readObject();
+					ht_bill.put(tmp.getNumber() + "",tmp);
+				}			
+			}
+			catch (IOException ioea)
+			{
+				fin.close();
+			}
+		}
+		catch (FileNotFoundException fnfea)
+		{
+			System.out.println("  (Cannot Find Bill Data File)");
+		}
+
+		//Display number of objects in each file
+		System.out.println("");
+		System.out.println("  Existing Records :");
+		System.out.println("     Customers      : " + (cnumber - 1));
+		System.out.println("     Rooms          : " + (rnumber - 1));
+		System.out.println("     Tables         : " + (tnumber - 1));
+		System.out.println("     Room Bookings  : " + (rbnumber - 1));
+		System.out.println("     Table Bookings : " + (tbnumber - 1));
+		System.out.println("");
+
+		System.out.println("  Waiting For Connection............");
+		ServerSocket listener = new ServerSocket(INPORT);
+		Socket s = listener.accept();
+		System.out.println("  Connected To Client");
+    
+		ObIn = new ObjectInputStream(s.getInputStream());
+		ObOut = new ObjectOutputStream(s.getOutputStream());
+
+		//Send numbers of each object to user interface
+		Numbers n = new Numbers(cnumber,rnumber,tnumber,rbnumber,tbnumber);
+		ObOut.writeObject(n);
+
+		//Main event processing routine
+		try
+		{
+				while (true)
+				{
+					ot = (ObjectType) ObIn.readObject();
+
+					//Room
+					if ((ot.getObjectType().compareTo("room") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						Room r = new Room();
+
+						if (ht_room.containsKey(tempstring))
+						{
+							r = (Room) ht_room.get(tempstring);
+						}
+						else
+						{
+							r.setNumber("Not Found");
+							r.setStandard("");
+							r.setNo_Beds("");
+							r.setBed_Type("");
+							r.setTariff("");
+							r.setStatus("");
+						}
+
+						ObOut.writeObject(r);
+					}
+					else if ((ot.getObjectType().compareTo("room") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						room = (Room) ObIn.readObject();
+						ht_room.put(room.getNumber() + "",room);
+						room.display();
+					}
+					//Customer
+					else if ((ot.getObjectType().compareTo("customer") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						Customer c = new Customer();
+
+						if (ht_customer.containsKey(tempstring))
+						{
+							c = (Customer) ht_customer.get(tempstring);
+						}
+						else
+						{
+							c.setNumber("Not Found");
+							c.setSurname("");
+							c.setOther_Names("");
+							c.setAddress("");
+							c.setPostcode("");
+							c.setTel_Number("");
+						}
+
+						ObOut.writeObject(c);
+					}
+					else if ((ot.getObjectType().compareTo("customer") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						customer = (Customer) ObIn.readObject();
+						ht_customer.put(customer.getNumber() + "",customer);
+						customer.display();
+					}
+					//Table
+					else if ((ot.getObjectType().compareTo("table") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						Table t = new Table();
+
+						if (ht_table.containsKey(tempstring))
+						{
+							t = (Table) ht_table.get(tempstring);
+						}
+						else
+						{
+							t.setNumber("Not Found");
+							t.setStatus("");
+						}
+
+						ObOut.writeObject(t);
+					}
+					else if ((ot.getObjectType().compareTo("table") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						table = (Table) ObIn.readObject();
+						ht_table.put(table.getNumber() + "",table);
+						table.display();
+					}
+					//Room Booking
+					else if ((ot.getObjectType().compareTo("roombooking") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						RoomBooking rb = new RoomBooking();
+
+						if (ht_roombooking.containsKey(tempstring))
+						{
+							rb = (RoomBooking) ht_roombooking.get(tempstring);
+						}
+						else
+						{
+							rb.setNumber("Not Found");
+
+							rb.setArrivalDateDay("");
+							rb.setArrivalDateMonth("");
+							rb.setArrivalDateYear("");
+							rb.setDepartureDateDay("");
+							rb.setDepartureDateMonth("");
+							rb.setDepartureDateYear("");
+							rb.setCheckedIn("");
+							rb.setStandard("");
+							rb.setNoPeople("");
+							rb.setDiscount("");
+							rb.setNotes("");
+						}
+
+						ObOut.writeObject(rb);
+					}
+					else if ((ot.getObjectType().compareTo("roombooking") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						roombooking = (RoomBooking) ObIn.readObject();
+						ht_roombooking.put(roombooking.getNumber() + "",roombooking);
+						roombooking.display();
+					}
+					else if ((ot.getObjectType().compareTo("roombooking") == 0) && (ot.getObjectArgument().compareTo("check") == 0))
+					{
+						roombooking = (RoomBooking) ObIn.readObject();
+						String bookingOK = check_Booking(roombooking);
+						ObOut.writeObject(bookingOK);
+					}
+					//Table Booking
+					else if ((ot.getObjectType().compareTo("tablebooking") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						TableBooking tb = new TableBooking();
+
+						if (ht_tablebooking.containsKey(tempstring))
+						{
+							tb = (TableBooking) ht_tablebooking.get(tempstring);
+						}
+						else
+						{
+							//alter values here
+						}
+
+						ObOut.writeObject(tb);
+					}
+					else if ((ot.getObjectType().compareTo("tablebooking") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						tablebooking = (TableBooking) ObIn.readObject();
+						ht_tablebooking.put(tablebooking.getNumber() + "",tablebooking);
+						System.out.println("  Table Booking Updated :");
+						tablebooking.display();
+					}
+					//Bill
+					else if ((ot.getObjectType().compareTo("bill") == 0) && (ot.getObjectArgument().compareTo("find") == 0))
+					{
+						tempstring = (String) ObIn.readObject();
+
+						Bill b = new Bill();
+
+						if (ht_bill.containsKey(tempstring))
+						{
+							b = (Bill) ht_bill.get(tempstring);
+						}
+						else
+						{
+							//alter values here
+						}
+
+						ObOut.writeObject(b);
+					}
+					else if ((ot.getObjectType().compareTo("bill") == 0) && (ot.getObjectArgument().compareTo("update") == 0))
+					{
+						bill = (Bill) ObIn.readObject();
+						ht_bill.put(bill.getNumber() + "",bill);
+						bill.display();
+					}
+				}
+		}
+		catch (EOFException eofe)
+		{
+			System.out.println("  Connection To Client Closed");
+			System.out.println("  Saving Data Files............");
+
+			//Customer
+			ostream = new FileOutputStream(CUSTOMERDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_customer.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Customer) ht_customer.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Room
+			ostream = new FileOutputStream(ROOMDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_room.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Room) ht_room.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Table
+			ostream = new FileOutputStream(TABLEDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_table.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Table) ht_table.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Room Booking
+			ostream = new FileOutputStream(ROOMBOOKINGDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_roombooking.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((RoomBooking) ht_roombooking.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Table Booking
+			ostream = new FileOutputStream(TABLEBOOKINGDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_tablebooking.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((TableBooking) ht_tablebooking.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Bill
+			ostream = new FileOutputStream(BILLDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_bill.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Bill) ht_bill.get(name.toString()));
+			}
+
+			fout.close();
+
+			System.out.println("  Exiting System............");
+		}
+		catch (SocketException se)
+		{
+			System.out.println("  Connection To Client Closed");
+			System.out.println("  Saving Data Files............");
+
+			//Customer
+			ostream = new FileOutputStream(CUSTOMERDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_customer.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Customer) ht_customer.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Room
+			ostream = new FileOutputStream(ROOMDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_room.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Room) ht_room.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Table
+			ostream = new FileOutputStream(TABLEDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_table.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Table) ht_table.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Room Booking
+			ostream = new FileOutputStream(ROOMBOOKINGDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_roombooking.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((RoomBooking) ht_roombooking.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Table Booking
+			ostream = new FileOutputStream(TABLEBOOKINGDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_tablebooking.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((TableBooking) ht_tablebooking.get(name.toString()));
+			}
+
+			fout.close();
+
+			//Bill
+			ostream = new FileOutputStream(BILLDATAFILE);
+			fout = new ObjectOutputStream(ostream);
+
+			for (Enumeration e = ht_bill.keys(); e.hasMoreElements();)
+			{
+				Object name = (Object) e.nextElement();
+				fout.writeObject((Bill) ht_bill.get(name.toString()));
+			}
+
+			fout.close();
+
+			System.out.println("  Exiting System............");
+		}
+	}
+
+	public static String check_Booking(RoomBooking roombooking_to_check)
+	{
+		int checkcount = 0, c_count = 0;
+		boolean booking_OK = false;
+		String tempstring = "";
+
+		for (Enumeration e = ht_room.keys(); e.hasMoreElements();)
+		{
+			Object name = (Object) e.nextElement();
+			Room temproom = (Room) ht_room.get(name.toString());
+
+			if ((roombooking_to_check.getStandard().compareTo(temproom.getStandard()) == 0) && (roombooking_to_check.getNoPeople().compareTo(temproom.getNo_Beds()) == 0))
+			{
+				for (Enumeration en = ht_roombooking.keys(); en.hasMoreElements();)
+				{
+					checkcount++;
+
+					Object nameone = (Object) en.nextElement();
+					RoomBooking temproombook = (RoomBooking) ht_roombooking.get(nameone.toString());
+
+					if (temproom.getNumber().compareTo(temproombook.getRoomNumber()) == 0)
+					{
+						c_count++;
+
+						//check dates of the two room bookings for conflicts
+						if (Integer.parseInt(roombooking_to_check.getArrivalDateYear()) > Integer.parseInt(temproombook.getDepartureDateYear()))
+							booking_OK = true;
+
+						if ((Integer.parseInt(roombooking_to_check.getArrivalDateMonth()) > Integer.parseInt(temproombook.getDepartureDateMonth())) && (Integer.parseInt(roombooking_to_check.getArrivalDateYear()) == Integer.parseInt(temproombook.getDepartureDateYear())))
+							booking_OK = true;
+
+						if ((Integer.parseInt(roombooking_to_check.getArrivalDateDay()) >= Integer.parseInt(temproombook.getDepartureDateDay())) && (Integer.parseInt(roombooking_to_check.getArrivalDateMonth()) == Integer.parseInt(temproombook.getDepartureDateMonth())))
+							booking_OK = true;
+
+						if (booking_OK)
+							tempstring = temproom.getNumber();
+					}
+				}
+
+				if (checkcount == 0)
+					tempstring = temproom.getNumber();
+
+				if (c_count == 0)
+					tempstring = temproom.getNumber();
+			}
+		}
+
+		if (tempstring.compareTo("") == 0)
+			tempstring = "no";
+
+		return tempstring;
+	}
+}
+</pre>
+</body>
+</html>

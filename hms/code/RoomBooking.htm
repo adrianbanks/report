@@ -1,0 +1,218 @@
+<html>
+<body>
+<pre>
+import java.io.*;
+
+public class RoomBooking implements Serializable
+{
+	private String Number;
+	private String Customer_Number;
+	private String Room_Number;
+	private String Arrival_Date_Day;
+	private String Arrival_Date_Month;
+	private String Arrival_Date_Year;
+	private String Departure_Date_Day;
+	private String Departure_Date_Month;
+	private String Departure_Date_Year;
+	private String Standard;
+	private String Checked_In;
+	private String No_People;
+	private String Discount;
+	private String Notes;
+
+	public RoomBooking()
+	{
+		this.Number = "";
+		this.Customer_Number = "";
+		this.Room_Number = "";
+		this.Arrival_Date_Day = "";
+		this.Arrival_Date_Month = "";
+		this.Arrival_Date_Year = "";
+		this.Departure_Date_Day = "";
+		this.Departure_Date_Month = "";
+		this.Departure_Date_Year = "";
+		this.Standard = "";
+		this.Checked_In = "";
+		this.No_People = "";
+		this.Discount = "";
+		this.Notes = "";
+	}
+
+	public RoomBooking(String num, String cus, String rom, String arra, String arrb, String arrc, String depa, String depb, String depc, String stn, String chi, String nop, String dis, String nts)
+	{
+		this.Number = num;
+		this.Customer_Number = cus;
+		this.Room_Number = rom;
+		this.Arrival_Date_Day = arra;
+		this.Arrival_Date_Month = arrb;
+		this.Arrival_Date_Year = arrc;
+		this.Departure_Date_Day = depa;
+		this.Departure_Date_Month = depb;
+		this.Departure_Date_Year = depc;
+		this.Standard = stn;
+		this.Checked_In = chi;
+		this.No_People = nop;
+		this.Discount = dis;
+		this.Notes = nts;
+	}
+
+	public String getNumber()
+	{
+		return this.Number;
+	}
+
+	public String getCustomerNumber()
+	{
+		return this.Customer_Number;
+	}
+
+	public String getRoomNumber()
+	{
+		return this.Room_Number;
+	}
+
+	public String getArrivalDateDay()
+	{
+		return this.Arrival_Date_Day;
+	}
+
+	public String getArrivalDateMonth()
+	{
+		return this.Arrival_Date_Month;
+	}
+
+	public String getArrivalDateYear()
+	{
+		return this.Arrival_Date_Year;
+	}
+
+	public String getDepartureDateDay()
+	{
+		return this.Departure_Date_Day;
+	}
+
+	public String getDepartureDateMonth()
+	{
+		return this.Departure_Date_Month;
+	}
+
+	public String getDepartureDateYear()
+	{
+		return this.Departure_Date_Year;
+	}
+
+	public String getStandard()
+	{
+		return this.Standard;
+	}
+
+	public String getCheckedIn()
+	{
+		return this.Checked_In;
+	}
+
+	public String getNoPeople()
+	{
+		return this.No_People;
+	}
+
+	public String getDiscount()
+	{
+		return this.Discount;
+	}
+
+	public String getNotes()
+	{
+		return this.Notes;
+	}
+
+	public void setNumber(String x)
+	{
+		this.Number = x;
+	}
+
+	public void setCustomerNumber(String x)
+	{
+		this.Customer_Number = x;
+	}
+
+	public void setRoomNumber(String x)
+	{
+		this.Room_Number = x;
+	}
+
+	public void setArrivalDateDay(String x)
+	{
+		this.Arrival_Date_Day = x;
+	}
+
+	public void setArrivalDateMonth(String x)
+	{
+		this.Arrival_Date_Month = x;
+	}
+
+	public void setArrivalDateYear(String x)
+	{
+		this.Arrival_Date_Year = x;
+	}
+
+	public void setDepartureDateDay(String x)
+	{
+		this.Departure_Date_Day = x;
+	}
+
+	public void setDepartureDateMonth(String x)
+	{
+		this.Departure_Date_Month = x;
+	}
+
+	public void setDepartureDateYear(String x)
+	{
+		this.Departure_Date_Year = x;
+	}
+
+	public void setStandard(String x)
+	{
+		this.Standard = x;
+	}
+
+	public void setCheckedIn(String x)
+	{
+		this.Checked_In = x;
+	}
+
+	public void setNoPeople(String x)
+	{
+		this.No_People = x;
+	}
+
+	public void setDiscount(String x)
+	{
+		this.Discount = x;
+	}
+
+	public void setNotes(String x)
+	{
+		this.Notes = x;
+	}
+
+	public void display()
+	{
+		System.out.println("");
+		System.out.println("  Room Booking Updated :");
+		System.out.println("     Booking Number   : " + this.Number);
+		System.out.println("     Customer Number  : " + this.Customer_Number);
+		System.out.println("     Room Number      : " + this.Room_Number);
+		System.out.println("     Arrival Date     : " + this.Arrival_Date_Day + "/" + this.Arrival_Date_Month + "/" + this.Arrival_Date_Year);
+		System.out.println("     Departure Date   : " + this.Departure_Date_Day + "/" + this.Departure_Date_Month + "/" + this.Departure_Date_Year);
+		System.out.println("     Standard         : " + this.Standard);
+		System.out.println("     Checked In       : " + this.Checked_In);
+		System.out.println("     No. Of People    : " + this.No_People);
+		System.out.println("     Discount         : " + this.Discount);
+		System.out.println("     Notes            : " + this.Notes);
+		System.out.println("");
+	}
+}
+</pre>
+</body>
+</html>
